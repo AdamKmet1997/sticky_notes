@@ -1,7 +1,7 @@
-const { contextBridge } = require('electron');
+const { contextBridge, ipcRenderer } = require('electron');
 
-// Expose APIs to the renderer process
 contextBridge.exposeInMainWorld('api', {
   saveNotes: (notes) => localStorage.setItem('notes', JSON.stringify(notes)),
   loadNotes: () => JSON.parse(localStorage.getItem('notes') || '[]'),
+  showWindow: () => ipcRenderer.send('show-window')
 });

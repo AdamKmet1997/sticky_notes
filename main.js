@@ -1,4 +1,4 @@
-const { app, BrowserWindow, Tray, Menu } = require('electron');
+const { app, BrowserWindow, Tray, Menu, ipcMain } = require('electron');
 const path = require('path');
 
 // For hot reload during development (optional)
@@ -26,24 +26,30 @@ app.on('ready', () => {
   tray.on('click', toggleWindow);
 });
 
+// Listen for the IPC message to show the window
+ipcMain.on('show-window', () => {
+  showWindow();
+});
+
 function createWindow() {
   window = new BrowserWindow({
-    width: 600, // Double the original width (300 * 2)
-    height: 600, // Double the original height (400 * 2)
+    width: 600, // Double the original width
+    height: 600, // Double the original height
     show: false,
     frame: false,
     resizable: true,
     webPreferences: {
-      nodeIntegration: true,
-      contextIsolation: false
+      nodeIntegration: false,
+      contextIsolation: true,
+      preload: path.join(__dirname, 'preload.js')
     }
   });
 
   window.loadFile('index.html');
 
-  // Scale the content to make everything appear twice as big
+  // Optionally, adjust zoom or other settings
   window.webContents.on('did-finish-load', () => {
-    window.webContents.setZoomFactor(1); // Scale content by 2x
+    window.webContents.setZoomFactor(1); // No scaling here; adjust as needed
   });
 
   window.on('blur', () => {

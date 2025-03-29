@@ -9,9 +9,10 @@
         background-color: #fffcaa;
         padding: 10px;
       }
-      #new-note {
+      #search-input {
+        width: 100%;
         margin-bottom: 10px;
-        padding: 5px 10px;
+        padding: 5px;
         font-size: 14px;
       }
       #notes-container {
@@ -38,7 +39,6 @@
         color: red;
         font-weight: bold;
       }
-      /* Style for the note title */
       .note-title {
         width: 100%;
         font-size: 16px;
@@ -46,13 +46,11 @@
         margin-bottom: 5px;
         box-sizing: border-box;
       }
-      /* Style for the creation date */
       .created {
         font-size: 10px;
         color: #777;
         margin-bottom: 5px;
       }
-      /* Expand textarea to fill the rest of the note */
       .note textarea {
         flex-grow: 1;
         width: 100%;
@@ -63,21 +61,20 @@
         outline: none;
       }
       #new-note {
-    position: fixed;
-    bottom: 10px;
-    right: 10px;
-    padding: 10px;
-    background-color: #03c216;
-    border: none;
-    border-radius: 50%;
-    cursor: pointer;
-    box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.2);
-  }
-
-  #new-note img {
-    display: block;
-    margin: auto;
-  }
+        position: fixed;
+        bottom: 10px;
+        right: 10px;
+        padding: 10px;
+        background-color: #03c216;
+        border: none;
+        border-radius: 50%;
+        cursor: pointer;
+        box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.2);
+      }
+      #new-note img {
+        display: block;
+        margin: auto;
+      }
     </style>
   </head>
   <body>
