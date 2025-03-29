@@ -1,6 +1,18 @@
 // Array to hold all notes
 let notes = [];
 
+// Debounce utility function
+function debounce(func, delay) {
+  let timeout;
+  return function (...args) {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => func.apply(this, args), delay);
+  };
+}
+
+// Debounced saveNotes function
+const debouncedSaveNotes = debounce(() => saveNotes(), 300);
+
 // Load notes from localStorage on startup
 function loadNotes() {
   const savedNotes = localStorage.getItem('notes');
@@ -40,12 +52,26 @@ function renderNotes() {
     });
     noteDiv.appendChild(deleteButton);
 
-    // Textarea for editing note content
+    // Title input for the note (first line)
+    const titleInput = document.createElement('input');
+    titleInput.classList.add('note-title');
+    titleInput.value = note.title;
+    titleInput.addEventListener('input', (event) => {
+      updateNoteTitle(note.id, event.target.value);
+    });
+    noteDiv.appendChild(titleInput);
+
+    // Display creation date
+    const createdDiv = document.createElement('div');
+    createdDiv.classList.add('created');
+    createdDiv.textContent = 'Created: ' + new Date(note.created).toLocaleString();
+    noteDiv.appendChild(createdDiv);
+
+    // Textarea for editing the note content
     const textarea = document.createElement('textarea');
     textarea.value = note.content;
-    // Auto-save changes on every input event
     textarea.addEventListener('input', (event) => {
-      updateNote(note.id, event.target.value);
+      updateNoteContent(note.id, event.target.value);
     });
     noteDiv.appendChild(textarea);
 
@@ -56,21 +82,33 @@ function renderNotes() {
 // Create a new note
 function createNote() {
   console.log('Creating a new note...');
+  const timestamp = Date.now();
   const newNote = {
-    id: Date.now(), // Unique ID based on current timestamp
-    content: ''
+    id: timestamp,
+    title: 'New Note',      // Default title
+    content: '',
+    created: timestamp      // Save creation time
   };
   notes.push(newNote);
   saveNotes();
   renderNotes();
 }
 
-// Update a note's content in the notes array and auto-save
-function updateNote(id, content) {
+// Update a note's title and auto-save
+function updateNoteTitle(id, title) {
+  const note = notes.find(n => n.id === id);
+  if (note) {
+    note.title = title;
+    debouncedSaveNotes(); // Use the debounced version of saveNotes
+  }
+}
+
+// Update a note's content and auto-save
+function updateNoteContent(id, content) {
   const note = notes.find(n => n.id === id);
   if (note) {
     note.content = content;
-    saveNotes();
+    debouncedSaveNotes(); // Use the debounced version of saveNotes
   }
 }
 

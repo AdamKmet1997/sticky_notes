@@ -1,8 +1,8 @@
 Core Features
-Create, Edit, and Delete Notes:
+Create, Edit, and Delete Notes: DONE
 Allow users to easily add new notes, modify existing ones, and remove notes they no longer need.
 
-Auto-Save/Persistence:
+Auto-Save/Persistence:DONE
 Automatically save changes (using localStorage, files, or a database) so that notes are preserved between sessions.
 
 Draggable & Resizable Notes:

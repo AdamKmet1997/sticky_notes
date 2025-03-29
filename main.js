@@ -17,10 +17,7 @@ app.on('ready', () => {
 
   const iconPath = path.join(__dirname, 'assets', 'icon.png');
   tray = new Tray(iconPath);
-  const contextMenu = Menu.buildFromTemplate([
-    // { label: 'New Note', click: () => { showWindow(); } },
-    // { label: 'Quit', click: () => { app.quit(); } }
-  ]);
+  const contextMenu = Menu.buildFromTemplate([]);
   tray.setToolTip('Sticky Notes');
   tray.setContextMenu(contextMenu);
 
@@ -31,8 +28,8 @@ app.on('ready', () => {
 
 function createWindow() {
   window = new BrowserWindow({
-    width: 300,
-    height: 400,
+    width: 600, // Double the original width (300 * 2)
+    height: 600, // Double the original height (400 * 2)
     show: false,
     frame: false,
     resizable: true,
@@ -43,6 +40,11 @@ function createWindow() {
   });
 
   window.loadFile('index.html');
+
+  // Scale the content to make everything appear twice as big
+  window.webContents.on('did-finish-load', () => {
+    window.webContents.setZoomFactor(1); // Scale content by 2x
+  });
 
   window.on('blur', () => {
     if (!window.webContents.isDevToolsOpened()) {
