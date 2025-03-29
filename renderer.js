@@ -1,17 +1,8 @@
 // Array to hold all notes
 let notes = [];
 
-// Debounce utility function
-function debounce(func, delay) {
-  let timeout;
-  return function (...args) {
-    clearTimeout(timeout);
-    timeout = setTimeout(() => func.apply(this, args), delay);
-  };
-}
-
-// Debounced saveNotes function
-const debouncedSaveNotes = debounce(() => saveNotes(), 300);
+// Current search query
+let searchQuery = '';
 
 // Load notes from localStorage on startup
 function loadNotes() {
@@ -33,12 +24,21 @@ function saveNotes() {
   localStorage.setItem('notes', JSON.stringify(notes));
 }
 
-// Render the notes list
+// Render the notes list, filtered by the search query
 function renderNotes() {
   const container = document.getElementById('notes-container');
   container.innerHTML = ''; // Clear previous notes
 
-  notes.forEach(note => {
+  // Filter notes based on the search query
+  const filteredNotes = notes.filter(note => {
+    const query = searchQuery.toLowerCase();
+    return (
+      note.title.toLowerCase().includes(query) ||
+      note.content.toLowerCase().includes(query)
+    );
+  });
+
+  filteredNotes.forEach(note => {
     const noteDiv = document.createElement('div');
     noteDiv.classList.add('note');
     noteDiv.setAttribute('data-id', note.id);
@@ -119,6 +119,12 @@ function deleteNote(id) {
   renderNotes();
 }
 
+// Handle search input
+function handleSearch(event) {
+  searchQuery = event.target.value; // Update the search query
+  renderNotes(); // Re-render notes based on the search query
+}
+
 // Wait for the DOM to fully load before attaching event listeners
 document.addEventListener('DOMContentLoaded', () => {
   console.log('DOM fully loaded. Setting up event listeners.');
@@ -132,6 +138,14 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   } else {
     console.error('New Note button not found in the DOM.');
+  }
+
+  // Attach event listener to the search input
+  const searchInput = document.getElementById('search-input');
+  if (searchInput) {
+    searchInput.addEventListener('input', handleSearch);
+  } else {
+    console.error('Search input not found in the DOM.');
   }
 
   // Initial load of notes when the app starts
