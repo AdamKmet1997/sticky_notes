@@ -4,6 +4,18 @@ let notes = [];
 // Current search query
 let searchQuery = '';
 
+// Debounce utility function
+function debounce(func, delay) {
+  let timeout;
+  return function (...args) {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => func.apply(this, args), delay);
+  };
+}
+
+// Debounced saveNotes function
+const debouncedSaveNotes = debounce(saveNotes, 300);
+
 // Load notes from localStorage on startup
 function loadNotes() {
   const savedNotes = localStorage.getItem('notes');
