@@ -227,4 +227,5 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Check global reminder every 10 seconds
   setInterval(checkGlobalReminder, 10000);
-  
+
+});
