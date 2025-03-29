@@ -1,0 +1,16 @@
+{
+  "name": "sticky_notes",
+  "version": "1.0.0",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "electron": "^35.1.2",
+    "electron-reload": "^2.0.0-alpha.1"
+  }
+}

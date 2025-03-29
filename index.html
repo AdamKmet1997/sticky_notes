@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Sticky Notes</title>
+    <style>
+      body {
+        font-family: sans-serif;
+        background-color: #fffcaa;
+        padding: 10px;
+      }
+      #new-note {
+        margin-bottom: 10px;
+        padding: 5px 10px;
+        font-size: 14px;
+      }
+      #notes-container {
+        display: flex;
+        flex-wrap: wrap;
+      }
+      .note {
+        width: 200px;
+        height: 200px;
+        background-color: #fffab3;
+        border: 1px solid #ccc;
+        padding: 5px;
+        margin: 5px;
+        position: relative;
+        box-shadow: 1px 1px 5px rgba(0,0,0,0.2);
+      }
+      .note textarea {
+        width: 100%;
+        height: calc(100% - 30px);
+        border: none;
+        resize: none;
+        background-color: transparent;
+        font-size: 14px;
+        outline: none;
+      }
+      .delete-button {
+        position: absolute;
+        right: 5px;
+        top: 5px;
+        cursor: pointer;
+        color: red;
+        font-weight: bold;
+      }
+      #new-note {
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+    padding: 10px;
+    background-color: #169b07;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.2);
+  }
+
+  #new-note img {
+    display: block;
+    margin: auto;
+  }
+    </style>
+  </head>
+  <body>
+    <button id="new-note">
+      <img src="assets/add.png" width="20" height="20" alt="Add Note">
+    </button>
+    <div id="notes-container"></div>
+    
+    <!-- Load the renderer JavaScript file -->
+    <script src="renderer.js"></script>
+  </body>
+</html>
