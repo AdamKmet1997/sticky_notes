@@ -9,15 +9,26 @@
         background-color: #fffcaa;
         padding: 10px;
       }
-      #search-input, #global-reminder {
-        width: 100%;
+      /* Flex container for header inputs */
+      #header {
+        display: flex;
+        gap: 10px;
         margin-bottom: 10px;
+      }
+      /* Both inputs share similar styling */
+      #header input {
+        flex: 1;
         padding: 5px;
         font-size: 14px;
       }
       #notes-container {
         display: flex;
         flex-wrap: wrap;
+      }
+      .note-title:focus {
+        outline: none !important;
+        border: none !important; /* or 'none' if you don't want a border at all */
+        box-shadow: none !important;
       }
       .note {
         width: 200px;
@@ -41,10 +52,11 @@
       }
       .note-title {
         width: 100%;
-        font-size: 16px;
+        font-size: 20px;
         padding: 5px;
         margin-bottom: 5px;
-        box-sizing: border-box;
+        border: none;
+        background-color: transparent;
       }
       .created {
         font-size: 10px;
@@ -78,11 +90,12 @@
     </style>
   </head>
   <body>
-    <input id="search-input" type="text" placeholder="Search notes..." />
-    <!-- Global reminder input: set one reminder time for the app -->
-    <input id="global-reminder" type="datetime-local" placeholder="Set global reminder" />
+    <div id="header">
+      <input id="search-input" type="text" placeholder="Search notes..." />
+      <input id="global-reminder" type="datetime-local" />
+    </div>
     <button id="new-note">
-      <img src="assets/add.png" width="20" height="20" alt="Add Note">
+      <img src="assets/add.png" width="20" height="20" alt="Add Note" />
     </button>
     <div id="notes-container"></div>
     <script src="renderer.js"></script>

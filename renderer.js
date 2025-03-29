@@ -228,16 +228,3 @@ document.addEventListener('DOMContentLoaded', () => {
   // Check global reminder every 10 seconds
   setInterval(checkGlobalReminder, 10000);
   
-  // Optionally add a test button for IPC (remove if not needed)
-  const testButton = document.createElement('button');
-  testButton.textContent = 'Test IPC';
-  testButton.addEventListener('click', () => {
-    if (window.api && window.api.showWindow) {
-      window.api.showWindow();
-      console.log('IPC message sent to show window');
-    } else {
-      console.warn('showWindow API is not available');
-    }
-  });
-  document.body.appendChild(testButton);
-});
