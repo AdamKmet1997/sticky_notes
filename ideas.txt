@@ -15,7 +15,7 @@ Support multiple sticky notes simultaneously, perhaps with a visual way to manag
 Customization Options:
 Enable users to change note colors, fonts, and themes (like light/dark mode) for a tailored experience.
 
-Search and Filter:
+Search and Filter: DONE
 Implement a search functionality so users can quickly find specific notes by keywords or tags.
 
 Synchronization:
@@ -36,3 +36,5 @@ Keep the interface clean and distraction-free, focusing on the note content.
 
 Notifications/Reminders:
 (Optional) Allow users to set reminders or notifications related to a note.
+
+Reminder timer: DONE

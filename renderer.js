@@ -1,6 +1,10 @@
 // Array to hold all notes
 let notes = [];
 
+// Global reminder variables
+let globalReminder = null;       // Timestamp (in ms) or null
+let globalReminderTriggered = false;
+
 // Current search query
 let searchQuery = '';
 
@@ -29,11 +33,22 @@ function loadNotes() {
   } else {
     notes = [];
   }
+  // Load global reminder from localStorage (if set)
+  const savedGlobalReminder = localStorage.getItem('globalReminder');
+  if (savedGlobalReminder) {
+    globalReminder = parseInt(savedGlobalReminder, 10);
+    globalReminderTriggered = false; // Reset trigger flag on load
+  }
 }
 
-// Save notes to localStorage
+// Save notes and global reminder to localStorage
 function saveNotes() {
   localStorage.setItem('notes', JSON.stringify(notes));
+  if (globalReminder) {
+    localStorage.setItem('globalReminder', globalReminder);
+  } else {
+    localStorage.removeItem('globalReminder');
+  }
 }
 
 // Render the notes list, filtered by the search query
@@ -79,19 +94,6 @@ function renderNotes() {
     createdDiv.textContent = 'Created: ' + new Date(note.created).toLocaleString();
     noteDiv.appendChild(createdDiv);
 
-    // Reminder input (datetime-local)
-    const reminderInput = document.createElement('input');
-    reminderInput.type = 'datetime-local';
-    if (note.reminder) {
-      // Format the timestamp to "YYYY-MM-DDTHH:mm"
-      const dt = new Date(note.reminder);
-      reminderInput.value = dt.toISOString().slice(0, 16);
-    }
-    reminderInput.addEventListener('change', (event) => {
-      updateNoteReminder(note.id, event.target.value);
-    });
-    noteDiv.appendChild(reminderInput);
-
     // Textarea for editing the note content
     const textarea = document.createElement('textarea');
     textarea.value = note.content;
@@ -112,9 +114,7 @@ function createNote() {
     id: timestamp,
     title: 'New Note',      // Default title
     content: '',
-    created: timestamp,     // Save creation time
-    reminder: null,         // No reminder set initially
-    reminderTriggered: false
+    created: timestamp      // Save creation time
   };
   notes.push(newNote);
   saveNotes();
@@ -139,22 +139,6 @@ function updateNoteContent(id, content) {
   }
 }
 
-// Update a note's reminder and auto-save
-function updateNoteReminder(id, datetimeString) {
-  const note = notes.find(n => n.id === id);
-  if (note) {
-    if (datetimeString) {
-      // Convert the datetime-local string to a timestamp
-      note.reminder = new Date(datetimeString).getTime();
-      note.reminderTriggered = false; // Reset triggered flag
-    } else {
-      note.reminder = null;
-      note.reminderTriggered = false;
-    }
-    debouncedSaveNotes();
-  }
-}
-
 // Delete a note from the notes array and update the display
 function deleteNote(id) {
   notes = notes.filter(n => n.id !== id);
@@ -168,28 +152,38 @@ function handleSearch(event) {
   renderNotes(); // Re-render notes based on the search query
 }
 
-// Periodically check for due reminders
-function checkReminders() {
-  const now = Date.now();
-  let triggered = false;
-  notes.forEach(note => {
-    if (note.reminder && !note.reminderTriggered && now >= note.reminder) {
-      note.reminderTriggered = true;
-      triggered = true;
-      console.log(`Reminder due for note id ${note.id}`);
-    }
-  });
-  if (triggered) {
-    saveNotes();
-    if (window.api && window.api.showWindow) {
-      console.log('Sending IPC message to show window');
-      window.api.showWindow();
-    } else {
-      console.warn('showWindow API not available');
+// Handle changes to the global reminder input
+function handleGlobalReminder(event) {
+  const datetimeString = event.target.value;
+  if (datetimeString) {
+    // Convert the datetime-local string to a timestamp
+    globalReminder = new Date(datetimeString).getTime();
+    globalReminderTriggered = false; // Reset triggered flag
+    console.log('Global reminder set for', new Date(globalReminder).toLocaleString());
+  } else {
+    globalReminder = null;
+    globalReminderTriggered = false;
+    console.log('Global reminder cleared');
+  }
+  saveNotes();
+}
+
+// Periodically check for the global reminder
+function checkGlobalReminder() {
+  if (globalReminder && !globalReminderTriggered) {
+    const now = Date.now();
+    if (now >= globalReminder) {
+      globalReminderTriggered = true;
+      console.log('Global reminder time reached');
+      // Trigger the main process to show the window using IPC
+      if (window.api && window.api.showWindow) {
+        window.api.showWindow();
+      } else {
+        console.warn('showWindow API not available');
+      }
     }
   }
 }
-
 
 // Wait for the DOM to fully load before attaching event listeners
 document.addEventListener('DOMContentLoaded', () => {
@@ -214,24 +208,36 @@ document.addEventListener('DOMContentLoaded', () => {
     console.error('Search input not found in the DOM.');
   }
 
+  // Attach event listener to the global reminder input
+  const globalReminderInput = document.getElementById('global-reminder');
+  if (globalReminderInput) {
+    globalReminderInput.addEventListener('change', handleGlobalReminder);
+    // If a global reminder was loaded from localStorage, set the input's value
+    if (globalReminder) {
+      const dt = new Date(globalReminder);
+      globalReminderInput.value = dt.toISOString().slice(0, 16);
+    }
+  } else {
+    console.error('Global reminder input not found in the DOM.');
+  }
+
   // Initial load of notes when the app starts
   loadNotes();
   renderNotes();
 
-  // Check reminders every 10 seconds
-  setInterval(checkReminders, 10000);
+  // Check global reminder every 10 seconds
+  setInterval(checkGlobalReminder, 10000);
+  
+  // Optionally add a test button for IPC (remove if not needed)
+  const testButton = document.createElement('button');
+  testButton.textContent = 'Test IPC';
+  testButton.addEventListener('click', () => {
+    if (window.api && window.api.showWindow) {
+      window.api.showWindow();
+      console.log('IPC message sent to show window');
+    } else {
+      console.warn('showWindow API is not available');
+    }
+  });
+  document.body.appendChild(testButton);
 });
-
-
-const testButton = document.createElement('button');
-testButton.textContent = 'Test IPC';
-testButton.addEventListener('click', () => {
-  // Use the exposed API from preload.js instead of require
-  if (window.api && window.api.showWindow) {
-    window.api.showWindow();
-    console.log('IPC message sent to show window');
-  } else {
-    console.warn('showWindow API is not available');
-  }
-});
-document.body.appendChild(testButton);

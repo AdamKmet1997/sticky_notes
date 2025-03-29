@@ -9,7 +9,7 @@
         background-color: #fffcaa;
         padding: 10px;
       }
-      #search-input {
+      #search-input, #global-reminder {
         width: 100%;
         margin-bottom: 10px;
         padding: 5px;
@@ -79,6 +79,8 @@
   </head>
   <body>
     <input id="search-input" type="text" placeholder="Search notes..." />
+    <!-- Global reminder input: set one reminder time for the app -->
+    <input id="global-reminder" type="datetime-local" placeholder="Set global reminder" />
     <button id="new-note">
       <img src="assets/add.png" width="20" height="20" alt="Add Note">
     </button>
