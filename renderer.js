@@ -117,7 +117,7 @@ function renderNotes() {
     previewDiv.style.overflowY = 'auto';
     // Optionally add some styling for preview (padding, background, etc.)
     previewDiv.style.padding = '5px';
-    previewDiv.style.backgroundColor = '#fff';
+    previewDiv.style.backgroundColor = 'transparent';
     contentContainer.appendChild(previewDiv);
 
     // Preview toggle button
