@@ -33,7 +33,7 @@
       .note {
         width: 200px;
         height: 250px;
-        background-color: #fffab3;
+        background-color: rgba(255, 255, 0, 0.2); /* Yellow touch with transparency */
         border: 1px solid #ccc;
         padding: 5px;
         margin: 5px;
@@ -87,12 +87,51 @@
         display: block;
         margin: auto;
       }
+       /* Glass effect for the search bar */
+  #search-input {
+    flex: 1;
+    padding: 10px;
+    font-size: 14px;
+    border: none;
+    border-radius: 10px;
+    background-color: rgba(255, 255, 0, 0.4); /* Yellow touch with transparency */
+    backdrop-filter: blur(10px); /* Glass effect */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    outline: none;
+    transition: all 0.3s ease;
+  }
+
+  /* Add hover and focus effects */
+  #search-input:hover,
+  #search-input:focus {
+    background-color: rgba(255, 255, 0, 0.3); /* Slightly darker yellow on hover/focus */
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2); /* Stronger shadow */
+  }
+  #global-reminder {
+  flex: 1;
+  padding: 10px;
+  font-size: 14px;
+  border: none;
+  border-radius: 10px;
+  background-color: rgba(255, 255, 0, 0.4); /* Darker yellow touch with transparency */
+  backdrop-filter: blur(10px); /* Glass effect */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+/* Add hover and focus effects */
+#global-reminder:hover,
+#global-reminder:focus {
+  background-color: rgba(255, 255, 0, 0.4); /* Slightly darker yellow on hover/focus */
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2); /* Stronger shadow */
+}
     </style>
   </head>
   <body>
     <div id="header">
       <input id="search-input" type="text" placeholder="Search notes..." />
-      <input id="global-reminder" type="datetime-local" />
+      <input id="global-reminder" type="datetime-local" placeholder="Set a reminder..." />
     </div>
     <button id="new-note">
       <img src="assets/add.png" width="20" height="20" alt="Add Note" />
