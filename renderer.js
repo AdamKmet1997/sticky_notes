@@ -37,7 +37,7 @@ function loadNotes() {
   const savedGlobalReminder = localStorage.getItem('globalReminder');
   if (savedGlobalReminder) {
     globalReminder = parseInt(savedGlobalReminder, 10);
-    globalReminderTriggered = false; // Reset trigger flag on load
+    globalReminderTriggered = false;
   }
 }
 
@@ -51,7 +51,6 @@ function saveNotes() {
   }
 }
 
-// Render the notes list, filtered by the search query
 // Render the notes list, filtered by the search query
 function renderNotes() {
   const container = document.getElementById('notes-container');
@@ -71,10 +70,13 @@ function renderNotes() {
     noteDiv.classList.add('note');
     noteDiv.setAttribute('data-id', note.id);
 
-    // Delete button for each note
+    // Delete button using the x.png icon
     const deleteButton = document.createElement('div');
     deleteButton.classList.add('delete-button');
-    deleteButton.textContent = 'X';
+    const deleteImg = document.createElement('img');
+    deleteImg.src = 'assets/x.png';
+    deleteImg.alt = 'Delete';
+    deleteButton.appendChild(deleteImg);
     deleteButton.addEventListener('click', () => {
       deleteNote(note.id);
     });
@@ -101,43 +103,50 @@ function renderNotes() {
     contentContainer.style.display = 'flex';
     contentContainer.style.flexDirection = 'column';
 
-    // Textarea for editing the note content (Markdown text)
+    // Textarea for editing the note content (Markdown), initially hidden
     const textarea = document.createElement('textarea');
     textarea.value = note.content;
+    textarea.style.display = 'none';
     textarea.addEventListener('input', (event) => {
       updateNoteContent(note.id, event.target.value);
     });
     contentContainer.appendChild(textarea);
 
-    // A div for rendered Markdown preview (initially hidden)
+    // Div for rendered Markdown preview (default visible, read-only)
     const previewDiv = document.createElement('div');
     previewDiv.classList.add('preview');
-    previewDiv.style.display = 'none';
+    previewDiv.style.display = 'block';
     previewDiv.style.flexGrow = '1';
     previewDiv.style.overflowY = 'auto';
-    // Optionally add some styling for preview (padding, background, etc.)
     previewDiv.style.padding = '5px';
     previewDiv.style.backgroundColor = 'transparent';
+    previewDiv.innerHTML = marked.parse(note.content);
     contentContainer.appendChild(previewDiv);
 
-    // Preview toggle button
-    const previewButton = document.createElement('button');
-    previewButton.textContent = 'Preview';
-    previewButton.addEventListener('click', () => {
-      if (previewButton.textContent === 'Preview') {
-        // Switch to preview mode: render Markdown to HTML
+    // Toggle button for switching between edit and preview modes
+    const toggleButton = document.createElement('button');
+    toggleButton.classList.add('toggle-button');
+    // Set initial text: we start in preview mode, so button says "Edit"
+    toggleButton.textContent = 'Edit';
+    // make rhe text bold
+    toggleButton.style.fontWeight = 'bold';
+    toggleButton.addEventListener('click', () => {
+      if (textarea.style.display === 'none') {
+        // Switch to edit mode: show textarea, hide preview
+        textarea.style.display = 'block';
+        previewDiv.style.display = 'none';
+        toggleButton.textContent = 'Preview';
+
+        textarea.focus();
+      } else {
+        // Switch back to preview (read-only) mode: update preview and hide textarea
         previewDiv.innerHTML = marked.parse(textarea.value);
         textarea.style.display = 'none';
         previewDiv.style.display = 'block';
-        previewButton.textContent = 'Edit';
-      } else {
-        // Switch back to edit mode
-        textarea.style.display = 'block';
-        previewDiv.style.display = 'none';
-        previewButton.textContent = 'Preview';
+        toggleButton.textContent = 'Edit';
       }
     });
-    contentContainer.appendChild(previewButton);
+    contentContainer.appendChild(toggleButton);
 
     noteDiv.appendChild(contentContainer);
     container.appendChild(noteDiv);
@@ -150,9 +159,9 @@ function createNote() {
   const timestamp = Date.now();
   const newNote = {
     id: timestamp,
-    title: 'New Note',      // Default title
+    title: 'New Note',
     content: '',
-    created: timestamp      // Save creation time
+    created: timestamp
   };
   notes.push(newNote);
   saveNotes();
@@ -177,7 +186,7 @@ function updateNoteContent(id, content) {
   }
 }
 
-// Delete a note from the notes array and update the display
+// Delete a note and re-render
 function deleteNote(id) {
   notes = notes.filter(n => n.id !== id);
   saveNotes();
@@ -186,17 +195,16 @@ function deleteNote(id) {
 
 // Handle search input
 function handleSearch(event) {
-  searchQuery = event.target.value; // Update the search query
-  renderNotes(); // Re-render notes based on the search query
+  searchQuery = event.target.value;
+  renderNotes();
 }
 
 // Handle changes to the global reminder input
 function handleGlobalReminder(event) {
   const datetimeString = event.target.value;
   if (datetimeString) {
-    // Convert the datetime-local string to a timestamp
     globalReminder = new Date(datetimeString).getTime();
-    globalReminderTriggered = false; // Reset triggered flag
+    globalReminderTriggered = false;
     console.log('Global reminder set for', new Date(globalReminder).toLocaleString());
   } else {
     globalReminder = null;
@@ -208,12 +216,13 @@ function handleGlobalReminder(event) {
 
 // Periodically check for the global reminder
 function checkGlobalReminder() {
-  if (globalReminder && !globalReminderTriggered) {
+  if (globalReminder) {
     const now = Date.now();
     if (now >= globalReminder) {
-      globalReminderTriggered = true;
       console.log('Global reminder time reached');
-      // Trigger the main process to show the window using IPC
+      // Immediately clear the reminder so it doesn't trigger again
+      globalReminder = null;
+      localStorage.removeItem('globalReminder');
       if (window.api && window.api.showWindow) {
         window.api.showWindow();
       } else {
@@ -223,11 +232,13 @@ function checkGlobalReminder() {
   }
 }
 
-// Wait for the DOM to fully load before attaching event listeners
+
+
+// Set up event listeners when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
   console.log('DOM fully loaded. Setting up event listeners.');
 
-  // Attach event listener to the "New Note" button
+  // New Note button event listener
   const newNoteButton = document.getElementById('new-note');
   if (newNoteButton) {
     newNoteButton.addEventListener('click', () => {
@@ -235,35 +246,32 @@ document.addEventListener('DOMContentLoaded', () => {
       createNote();
     });
   } else {
-    console.error('New Note button not found in the DOM.');
+    console.error('New Note button not found.');
   }
 
-  // Attach event listener to the search input
+  // Search input event listener
   const searchInput = document.getElementById('search-input');
   if (searchInput) {
     searchInput.addEventListener('input', handleSearch);
   } else {
-    console.error('Search input not found in the DOM.');
+    console.error('Search input not found.');
   }
 
-  // Attach event listener to the global reminder input
+  // Global reminder input event listener
   const globalReminderInput = document.getElementById('global-reminder');
   if (globalReminderInput) {
     globalReminderInput.addEventListener('change', handleGlobalReminder);
-    // If a global reminder was loaded from localStorage, set the input's value
     if (globalReminder) {
       const dt = new Date(globalReminder);
       globalReminderInput.value = dt.toISOString().slice(0, 16);
     }
   } else {
-    console.error('Global reminder input not found in the DOM.');
+    console.error('Global reminder input not found.');
   }
 
-  // Initial load of notes when the app starts
   loadNotes();
   renderNotes();
 
   // Check global reminder every 10 seconds
   setInterval(checkGlobalReminder, 10000);
-
 });
