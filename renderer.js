@@ -52,6 +52,7 @@ function saveNotes() {
 }
 
 // Render the notes list, filtered by the search query
+// Render the notes list, filtered by the search query
 function renderNotes() {
   const container = document.getElementById('notes-container');
   container.innerHTML = ''; // Clear previous notes
@@ -94,14 +95,51 @@ function renderNotes() {
     createdDiv.textContent = 'Created: ' + new Date(note.created).toLocaleString();
     noteDiv.appendChild(createdDiv);
 
-    // Textarea for editing the note content
+    // Create a container for content editing and preview toggle
+    const contentContainer = document.createElement('div');
+    contentContainer.style.flexGrow = '1';
+    contentContainer.style.display = 'flex';
+    contentContainer.style.flexDirection = 'column';
+
+    // Textarea for editing the note content (Markdown text)
     const textarea = document.createElement('textarea');
     textarea.value = note.content;
     textarea.addEventListener('input', (event) => {
       updateNoteContent(note.id, event.target.value);
     });
-    noteDiv.appendChild(textarea);
+    contentContainer.appendChild(textarea);
 
+    // A div for rendered Markdown preview (initially hidden)
+    const previewDiv = document.createElement('div');
+    previewDiv.classList.add('preview');
+    previewDiv.style.display = 'none';
+    previewDiv.style.flexGrow = '1';
+    previewDiv.style.overflowY = 'auto';
+    // Optionally add some styling for preview (padding, background, etc.)
+    previewDiv.style.padding = '5px';
+    previewDiv.style.backgroundColor = '#fff';
+    contentContainer.appendChild(previewDiv);
+
+    // Preview toggle button
+    const previewButton = document.createElement('button');
+    previewButton.textContent = 'Preview';
+    previewButton.addEventListener('click', () => {
+      if (previewButton.textContent === 'Preview') {
+        // Switch to preview mode: render Markdown to HTML
+        previewDiv.innerHTML = marked.parse(textarea.value);
+        textarea.style.display = 'none';
+        previewDiv.style.display = 'block';
+        previewButton.textContent = 'Edit';
+      } else {
+        // Switch back to edit mode
+        textarea.style.display = 'block';
+        previewDiv.style.display = 'none';
+        previewButton.textContent = 'Preview';
+      }
+    });
+    contentContainer.appendChild(previewButton);
+
+    noteDiv.appendChild(contentContainer);
     container.appendChild(noteDiv);
   });
 }

@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <title>Sticky Notes</title>
     <style>
+      /* Your existing CSS */
       body {
         font-family: sans-serif;
         background-color: #fffcaa;
@@ -15,7 +16,6 @@
         gap: 10px;
         margin-bottom: 10px;
       }
-      /* Both inputs share similar styling */
       #header input {
         flex: 1;
         padding: 5px;
@@ -27,7 +27,7 @@
       }
       .note-title:focus {
         outline: none !important;
-        border: none !important; /* or 'none' if you don't want a border at all */
+        border: none !important;
         box-shadow: none !important;
       }
       .note {
@@ -98,6 +98,8 @@
       <img src="assets/add.png" width="20" height="20" alt="Add Note" />
     </button>
     <div id="notes-container"></div>
+    <!-- Load marked before renderer.js -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="renderer.js"></script>
   </body>
 </html>
