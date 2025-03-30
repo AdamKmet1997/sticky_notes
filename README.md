@@ -2,6 +2,9 @@
 
 Sticky Notes is a lightweight, cross-platform desktop application built with Electron. It offers a fast and intuitive way to create, edit, search, and manage your notes. Featuring Markdown support, auto-save, and global reminders, Sticky Notes helps you stay organized and productive—all accessible from a sleek system tray interface.
 
+![Sticky Notes App](assets/app.png)
+
+
 ## Features
 
 - **Create and Manage Notes:**  
