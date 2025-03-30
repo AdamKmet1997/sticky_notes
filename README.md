@@ -25,19 +25,9 @@ Sticky Notes is a lightweight, cross-platform desktop application built with Ele
 - **System Tray Integration:**  
   Access your notes quickly via a system tray icon, keeping your workspace uncluttered.
   
-- **Cross-Platform:**  
-  Works on macOS, Windows, and Linux.
-
 ---
 
 ## Installation for Developers
-
-If you'd like to build or contribute to Sticky Notes, follow these steps to set up your development environment:
-
-### Prerequisites
-- **Node.js** (v16 or later)
-- **npm** (or **yarn**)
-- **Git**
 
 ### Steps to Set Up the Project
 1. Clone the repository:
