@@ -12,7 +12,13 @@ Sticky Notes is a lightweight desktop application built with Electron that allow
 
 ## Installation
 
+### Download the App
+Download the latest version of Sticky Notes for macOS from the link below:
+
+[Download Sticky Notes v1.0.0 (macOS)](https://github.com/AdamKmet1997/sticky_notes/releases/download/v1.0.0/sticky-notes-1.0.0-arm64.dmg)
+
+### Build from Source
 1. Clone the repository:
    ```bash
-   git clone https://github.com/your-username/sticky-notes.git
-   cd sticky-notes
+   git clone https://github.com/AdamKmet1997/sticky_notes.git
+   cd sticky_notes
