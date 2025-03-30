@@ -1,16 +1,24 @@
 {
-  "name": "sticky_notes",
+  "name": "sticky-notes",
   "version": "1.0.0",
+  "description": "Sticky Notes is a cross-platform desktop application built with Electron. It provides a fast and intuitive way to create, edit, and manage notes with Markdown support, auto-save, and global reminders—all accessible via a sleek system tray interface.",
   "main": "main.js",
   "scripts": {
-    "start": "electron ."
+    "start": "electron .",
+    "build": "electron-builder"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
+  "author": "Adam Kmet",
+  "license": "MIT",
   "devDependencies": {
-    "electron": "^35.1.2",
-    "electron-reload": "^2.0.0-alpha.1"
+    "electron": "^25.0.0",
+    "electron-builder": "^23.6.0"
+  },
+"build": {
+  "appId": "com.adamkmet.stickynotes",
+  "mac": {
+    "category": "public.app-category.productivity",
+    "target": "dmg",
+    "icon": "assets/icon.icns"
   }
+}
 }

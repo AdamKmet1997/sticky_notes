@@ -126,20 +126,15 @@ function renderNotes() {
     // Toggle button for switching between edit and preview modes
     const toggleButton = document.createElement('button');
     toggleButton.classList.add('toggle-button');
-    // Set initial text: we start in preview mode, so button says "Edit"
     toggleButton.textContent = 'Edit';
-    // make rhe text bold
     toggleButton.style.fontWeight = 'bold';
     toggleButton.addEventListener('click', () => {
       if (textarea.style.display === 'none') {
-        // Switch to edit mode: show textarea, hide preview
         textarea.style.display = 'block';
         previewDiv.style.display = 'none';
         toggleButton.textContent = 'Preview';
-
         textarea.focus();
       } else {
-        // Switch back to preview (read-only) mode: update preview and hide textarea
         previewDiv.innerHTML = marked.parse(textarea.value);
         textarea.style.display = 'none';
         previewDiv.style.display = 'block';
@@ -220,7 +215,6 @@ function checkGlobalReminder() {
     const now = Date.now();
     if (now >= globalReminder) {
       console.log('Global reminder time reached');
-      // Immediately clear the reminder so it doesn't trigger again
       globalReminder = null;
       localStorage.removeItem('globalReminder');
       if (window.api && window.api.showWindow) {
@@ -232,13 +226,10 @@ function checkGlobalReminder() {
   }
 }
 
-
-
 // Set up event listeners when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
   console.log('DOM fully loaded. Setting up event listeners.');
 
-  // New Note button event listener
   const newNoteButton = document.getElementById('new-note');
   if (newNoteButton) {
     newNoteButton.addEventListener('click', () => {
@@ -249,7 +240,6 @@ document.addEventListener('DOMContentLoaded', () => {
     console.error('New Note button not found.');
   }
 
-  // Search input event listener
   const searchInput = document.getElementById('search-input');
   if (searchInput) {
     searchInput.addEventListener('input', handleSearch);
@@ -257,7 +247,6 @@ document.addEventListener('DOMContentLoaded', () => {
     console.error('Search input not found.');
   }
 
-  // Global reminder input event listener
   const globalReminderInput = document.getElementById('global-reminder');
   if (globalReminderInput) {
     globalReminderInput.addEventListener('change', handleGlobalReminder);
@@ -272,6 +261,5 @@ document.addEventListener('DOMContentLoaded', () => {
   loadNotes();
   renderNotes();
 
-  // Check global reminder every 10 seconds
   setInterval(checkGlobalReminder, 10000);
 });

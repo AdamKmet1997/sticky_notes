@@ -1,10 +1,10 @@
 const { app, BrowserWindow, Tray, Menu, ipcMain } = require('electron');
 const path = require('path');
 
-// For hot reload during development (optional)
-require('electron-reload')(__dirname, {
-  electron: require(path.join(__dirname, 'node_modules', 'electron'))
-});
+// // For hot reload during development (optional)
+// require('electron-reload')(__dirname, {
+//   electron: require(path.join(__dirname, 'node_modules', 'electron'))
+// });
 
 let tray = null;
 let window = null;
@@ -33,8 +33,8 @@ ipcMain.on('show-window', () => {
 
 function createWindow() {
   window = new BrowserWindow({
-    width: 600, // Double the original width
-    height: 600, // Double the original height
+    width: 600, 
+    height: 600, 
     show: false,
     frame: false,
     resizable: true,
@@ -47,9 +47,8 @@ function createWindow() {
 
   window.loadFile('index.html');
 
-  // Optionally, adjust zoom or other settings
   window.webContents.on('did-finish-load', () => {
-    window.webContents.setZoomFactor(1); // No scaling here; adjust as needed
+    window.webContents.setZoomFactor(1); 
   });
 
   window.on('blur', () => {
