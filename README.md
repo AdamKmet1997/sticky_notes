@@ -25,17 +25,37 @@ Sticky Notes is a lightweight, cross-platform desktop application built with Ele
 - **Cross-Platform:**  
   Works on macOS, Windows, and Linux.
 
-## Installation
+---
 
-### Download the App
+## Installation for Developers
 
-Download the latest version of Sticky Notes for macOS from the link below:
+If you'd like to build or contribute to Sticky Notes, follow these steps to set up your development environment:
 
-[Download Sticky Notes v1.0.0 (macOS)](https://github.com/AdamKmet1997/sticky_notes/releases/download/v1.0.0/sticky-notes-1.0.0-arm64.dmg)
+### Prerequisites
+- **Node.js** (v16 or later)
+- **npm** (or **yarn**)
+- **Git**
 
-### Homebrew Installation
+### Steps to Set Up the Project
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/AdamKmet1997/sticky_notes.git
+   cd sticky_notes
+   ```
+2. Install dependencies:
 
-If you use Homebrew, you can install Sticky Notes with:
+``` bash
+   npm install
+```
 
-```bash
-brew install --cask sticky-notes
+3. Start the development server:
+
+``` bash
+   npm start
+```
+
+4. To build the app:
+
+``` bash 
+   npm run build
+```
