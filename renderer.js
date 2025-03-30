@@ -105,19 +105,19 @@ function renderNotes() {
     contentContainer.style.display = 'flex';
     contentContainer.style.flexDirection = 'column';
 
-    // Textarea for editing the note content (Markdown), initially hidden
+    // Textarea for editing the note content (Markdown), initially visible
     const textarea = document.createElement('textarea');
     textarea.value = note.content;
-    textarea.style.display = 'none';
+    textarea.style.display = 'block'; // Make edit mode the default
     textarea.addEventListener('input', (event) => {
       updateNoteContent(note.id, event.target.value);
     });
     contentContainer.appendChild(textarea);
 
-    // Div for rendered Markdown preview (default visible, read-only)
+    // Div for rendered Markdown preview (default hidden)
     const previewDiv = document.createElement('div');
     previewDiv.classList.add('preview');
-    previewDiv.style.display = 'block';
+    previewDiv.style.display = 'none'; // Hide preview mode by default
     previewDiv.style.flexGrow = '1';
     previewDiv.style.overflowY = 'auto';
     previewDiv.style.padding = '5px';
@@ -125,10 +125,16 @@ function renderNotes() {
     previewDiv.innerHTML = marked.parse(note.content);
     contentContainer.appendChild(previewDiv);
 
+    // Container for buttons (Edit/Preview and Secret)
+    const buttonContainer = document.createElement('div');
+    buttonContainer.style.display = 'flex';
+    buttonContainer.style.gap = '10px';
+    buttonContainer.style.marginTop = '5px';
+
     // Toggle button for switching between edit and preview modes
     const toggleButton = document.createElement('button');
     toggleButton.classList.add('toggle-button');
-    toggleButton.textContent = 'Edit';
+    toggleButton.textContent = 'Preview'; // Default state is edit mode
     toggleButton.style.fontWeight = 'bold';
     toggleButton.addEventListener('click', () => {
       if (textarea.style.display === 'none') {
@@ -145,8 +151,27 @@ function renderNotes() {
         toggleButton.textContent = 'Edit';
       }
     });
-    contentContainer.appendChild(toggleButton);
+    buttonContainer.appendChild(toggleButton);
 
+    // Secret button to toggle blur
+    const secretButton = document.createElement('button');
+    secretButton.classList.add('toggle-button');
+    secretButton.textContent = 'Secret';
+    secretButton.addEventListener('click', () => {
+      if (textarea.style.filter === 'blur(5px)') {
+        textarea.style.filter = 'none';
+        secretButton.textContent = 'Secret';
+        previewDiv.style.filter = 'none';
+      } else {
+        textarea.style.filter = 'blur(5px)';
+        secretButton.textContent = 'Unblur';
+        //also blur for preview
+        previewDiv.style.filter = 'blur(5px)';
+      }
+    });
+    buttonContainer.appendChild(secretButton);
+
+    contentContainer.appendChild(buttonContainer);
     noteDiv.appendChild(contentContainer);
     container.appendChild(noteDiv);
   });

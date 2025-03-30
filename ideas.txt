@@ -8,6 +8,12 @@ Automatically save changes (using localStorage, files, or a database) so that no
 Draggable & Resizable Notes:
 Let users reposition and resize individual notes on their screen for a personalized layout.
 
+Add Pin note so it cant be deleted while pinned
+
+add are you sure to delete pop up when deleting
+
+Add blur note feature for selected notes
+
 Advanced Features
 Multiple Notes Management:
 Support multiple sticky notes simultaneously, perhaps with a visual way to manage or group them.

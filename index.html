@@ -176,6 +176,16 @@
         border-radius: 50%;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
       }
+      .note textarea {
+        transition: filter 0.3s ease; /* Smooth transition for blur effect */
+      }
+      .toggle-button {
+        margin-top: 5px;
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-weight: bold;
+      }
     </style>
   </head>
   <body>
@@ -188,7 +198,11 @@
     <button id="new-note">
       <img src="assets/add.png" alt="Add Note" />
     </button>
-    <a id="github-link" href="https://github.com/AdamKmet1997/sticky_notes" target="_blank">
+    <a
+      id="github-link"
+      href="https://github.com/AdamKmet1997/sticky_notes"
+      target="_blank"
+    >
       <img src="assets/github.png" alt="GitHub Repository" />
     </a>
     <div id="notes-container"></div>
