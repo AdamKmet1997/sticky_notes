@@ -62,3 +62,6 @@ If you'd like to build or contribute to Sticky Notes, follow these steps to set 
 ``` bash 
    npm run build
 ```
+
+
+[!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://buymeacoffee.com/adamkmet)
