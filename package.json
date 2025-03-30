@@ -5,20 +5,28 @@
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "build": "electron-builder"
+    "build": "electron-builder",
+    "lint": "eslint .",
+    "format": "prettier --write ."
   },
   "author": "Adam Kmet",
   "license": "MIT",
   "devDependencies": {
+    "@eslint/js": "^9.23.0",
     "electron": "^25.0.0",
-    "electron-builder": "^23.6.0"
+    "electron-builder": "^23.6.0",
+    "eslint": "^9.23.0",
+    "eslint-config-prettier": "^10.1.1",
+    "eslint-plugin-prettier": "^5.2.5",
+    "globals": "^16.0.0",
+    "prettier": "^3.5.3"
   },
-"build": {
-  "appId": "com.adamkmet.stickynotes",
-  "mac": {
-    "category": "public.app-category.productivity",
-    "target": "dmg",
-    "icon": "assets/icon.icns"
+  "build": {
+    "appId": "com.adamkmet.stickynotes",
+    "mac": {
+      "category": "public.app-category.productivity",
+      "target": "dmg",
+      "icon": "assets/icon.icns"
+    }
   }
-}
 }

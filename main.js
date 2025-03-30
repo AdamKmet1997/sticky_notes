@@ -1,3 +1,6 @@
+/* eslint-env node */
+/* global __dirname, process */
+
 const { app, BrowserWindow, Tray, Menu, ipcMain } = require('electron');
 const path = require('path');
 
@@ -33,22 +36,22 @@ ipcMain.on('show-window', () => {
 
 function createWindow() {
   window = new BrowserWindow({
-    width: 600, 
-    height: 600, 
+    width: 600,
+    height: 600,
     show: false,
     frame: false,
     resizable: true,
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
-      preload: path.join(__dirname, 'preload.js')
-    }
+      preload: path.join(__dirname, 'preload.js'),
+    },
   });
 
   window.loadFile('index.html');
 
   window.webContents.on('did-finish-load', () => {
-    window.webContents.setZoomFactor(1); 
+    window.webContents.setZoomFactor(1);
   });
 
   window.on('blur', () => {
@@ -69,7 +72,9 @@ function toggleWindow() {
 function showWindow() {
   const trayBounds = tray.getBounds();
   const windowBounds = window.getBounds();
-  const x = Math.round(trayBounds.x + (trayBounds.width / 2) - (windowBounds.width / 2));
+  const x = Math.round(
+    trayBounds.x + trayBounds.width / 2 - windowBounds.width / 2
+  );
   const y = Math.round(trayBounds.y + trayBounds.height);
 
   window.setPosition(x, y, false);

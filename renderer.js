@@ -1,9 +1,11 @@
+/* eslint-env browser */
+/* global marked */
+
 // Array to hold all notes
 let notes = [];
 
-// Global reminder variables
-let globalReminder = null;       // Timestamp (in ms) or null
-let globalReminderTriggered = false;
+// Global reminder variable
+let globalReminder = null; // Timestamp (in ms) or null
 
 // Current search query
 let searchQuery = '';
@@ -37,7 +39,6 @@ function loadNotes() {
   const savedGlobalReminder = localStorage.getItem('globalReminder');
   if (savedGlobalReminder) {
     globalReminder = parseInt(savedGlobalReminder, 10);
-    globalReminderTriggered = false;
   }
 }
 
@@ -57,7 +58,7 @@ function renderNotes() {
   container.innerHTML = ''; // Clear previous notes
 
   // Filter notes based on the search query
-  const filteredNotes = notes.filter(note => {
+  const filteredNotes = notes.filter((note) => {
     const query = searchQuery.toLowerCase();
     return (
       note.title.toLowerCase().includes(query) ||
@@ -65,7 +66,7 @@ function renderNotes() {
     );
   });
 
-  filteredNotes.forEach(note => {
+  filteredNotes.forEach((note) => {
     const noteDiv = document.createElement('div');
     noteDiv.classList.add('note');
     noteDiv.setAttribute('data-id', note.id);
@@ -94,7 +95,8 @@ function renderNotes() {
     // Display creation date
     const createdDiv = document.createElement('div');
     createdDiv.classList.add('created');
-    createdDiv.textContent = 'Created: ' + new Date(note.created).toLocaleString();
+    createdDiv.textContent =
+      'Created: ' + new Date(note.created).toLocaleString();
     noteDiv.appendChild(createdDiv);
 
     // Create a container for content editing and preview toggle
@@ -130,11 +132,13 @@ function renderNotes() {
     toggleButton.style.fontWeight = 'bold';
     toggleButton.addEventListener('click', () => {
       if (textarea.style.display === 'none') {
+        // Switch to edit mode: show textarea, hide preview
         textarea.style.display = 'block';
         previewDiv.style.display = 'none';
         toggleButton.textContent = 'Preview';
         textarea.focus();
       } else {
+        // Switch back to preview (read-only) mode: update preview and hide textarea
         previewDiv.innerHTML = marked.parse(textarea.value);
         textarea.style.display = 'none';
         previewDiv.style.display = 'block';
@@ -156,7 +160,7 @@ function createNote() {
     id: timestamp,
     title: 'New Note',
     content: '',
-    created: timestamp
+    created: timestamp,
   };
   notes.push(newNote);
   saveNotes();
@@ -165,7 +169,7 @@ function createNote() {
 
 // Update a note's title and auto-save
 function updateNoteTitle(id, title) {
-  const note = notes.find(n => n.id === id);
+  const note = notes.find((n) => n.id === id);
   if (note) {
     note.title = title;
     debouncedSaveNotes();
@@ -174,7 +178,7 @@ function updateNoteTitle(id, title) {
 
 // Update a note's content and auto-save
 function updateNoteContent(id, content) {
-  const note = notes.find(n => n.id === id);
+  const note = notes.find((n) => n.id === id);
   if (note) {
     note.content = content;
     debouncedSaveNotes();
@@ -183,7 +187,7 @@ function updateNoteContent(id, content) {
 
 // Delete a note and re-render
 function deleteNote(id) {
-  notes = notes.filter(n => n.id !== id);
+  notes = notes.filter((n) => n.id !== id);
   saveNotes();
   renderNotes();
 }
@@ -199,11 +203,12 @@ function handleGlobalReminder(event) {
   const datetimeString = event.target.value;
   if (datetimeString) {
     globalReminder = new Date(datetimeString).getTime();
-    globalReminderTriggered = false;
-    console.log('Global reminder set for', new Date(globalReminder).toLocaleString());
+    console.log(
+      'Global reminder set for',
+      new Date(globalReminder).toLocaleString()
+    );
   } else {
     globalReminder = null;
-    globalReminderTriggered = false;
     console.log('Global reminder cleared');
   }
   saveNotes();

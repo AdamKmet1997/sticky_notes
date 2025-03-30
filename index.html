@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
   <head>
     <meta charset="UTF-8" />
@@ -8,7 +8,6 @@
         font-family: 'Open Sans', sans-serif;
         padding: 10px;
         background-color: #efeeda;
-
       }
       /* Header: search and global reminder side by side */
       #header {
@@ -26,45 +25,44 @@
       }
       /* Glass effect for the global reminder input */
       #global-reminder {
-          flex: 1;
-          padding: 10px;
-          font-size: 14px;
-          border: none;
-          border-radius: 10px;
-          background-color: rgba(255, 255, 0, 0.3); /* Darker yellow touch with transparency */
-          backdrop-filter: blur(10px); /* Glass effect */
-          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow */
-          outline: none;
-          transition: all 0.3s ease;
-        }
+        flex: 1;
+        padding: 10px;
+        font-size: 14px;
+        border: none;
+        border-radius: 10px;
+        background-color: rgba(255, 255, 0, 0.3);
+        backdrop-filter: blur(10px);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        outline: none;
+        transition: all 0.3s ease;
+      }
 
-        /* Add hover and focus effects */
-        #global-reminder:hover,
-        #global-reminder:focus {
-          background-color: rgba(255, 255, 0, 0.4); /* Slightly darker yellow on hover/focus */
-          box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2); /* Stronger shadow */
-        }
+      /* Add hover and focus effects */
+      #global-reminder:hover,
+      #global-reminder:focus {
+        background-color: rgba(255, 255, 0, 0.4);
+        box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2);
+      }
 
-              /* Glass effect for the global reminder input */
       #search-input {
-          flex: 1;
-          padding: 10px;
-          font-size: 14px;
-          border: none;
-          border-radius: 10px;
-          background-color: rgba(255, 255, 0, 0.3); /* Darker yellow touch with transparency */
-          backdrop-filter: blur(10px); /* Glass effect */
-          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow */
-          outline: none;
-          transition: all 0.3s ease;
-        }
+        flex: 1;
+        padding: 10px;
+        font-size: 14px;
+        border: none;
+        border-radius: 10px;
+        background-color: rgba(255, 255, 0, 0.3);
+        backdrop-filter: blur(10px);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        outline: none;
+        transition: all 0.3s ease;
+      }
 
-        /* Add hover and focus effects */
-        #search-input:hover,
-        #search-input:focus {
-          background-color: rgba(255, 255, 0, 0.4); /* Slightly darker yellow on hover/focus */
-          box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2); /* Stronger shadow */
-        }
+      /* Add hover and focus effects */
+      #search-input:hover,
+      #search-input:focus {
+        background-color: rgba(255, 255, 0, 0.4);
+        box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2);
+      }
       #global-reminder-icon {
         width: 20px;
         height: 20px;
@@ -90,7 +88,7 @@
         transition: box-shadow 0.2s ease;
       }
       .note:hover {
-        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
       }
       /* Delete button using the x.png icon */
       .delete-button {
@@ -161,9 +159,8 @@
         border: none;
         border-radius: 50%;
         cursor: pointer;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
       }
-  
     </style>
   </head>
   <body>
@@ -177,7 +174,6 @@
       <img src="assets/add.png" alt="Add Note" />
     </button>
     <div id="notes-container"></div>
-    <!-- Load marked before renderer.js -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="renderer.js"></script>
   </body>
