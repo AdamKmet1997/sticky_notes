@@ -187,6 +187,12 @@ function renderNotes() {
     // Set tooltip and alt text based on pinned state:
     pinImg.alt = note.pinned ? 'Unpin Note' : 'Pin Note';
     pinButton.title = note.pinned ? 'Unpin Note' : 'Pin Note';
+    // if pinned add red border around the note
+    if (note.pinned) {
+      noteDiv.style.border = '2px solid red';
+    } else {
+      noteDiv.style.border = 'none';
+    }
     pinButton.appendChild(pinImg);
     pinButton.addEventListener('click', () => {
       note.pinned = !note.pinned;
@@ -203,7 +209,7 @@ function renderNotes() {
 }
 
 
-// Create a new note with a pinned property
+// Create a new note
 function createNote() {
   console.log('Creating a new note...');
   const timestamp = Date.now();
@@ -212,7 +218,7 @@ function createNote() {
     title: 'New Note',
     content: '',
     created: timestamp,
-    pinned: false, // New property: note is not pinned by default
+    pinned: false,
   };
   notes.push(newNote);
   saveNotes();
@@ -262,7 +268,6 @@ function handleGlobalReminder(event) {
     );
   } else {
     globalReminder = null;
-    console.log('Global reminder cleared');
   }
   saveNotes();
 }
@@ -319,5 +324,5 @@ document.addEventListener('DOMContentLoaded', () => {
   loadNotes();
   renderNotes();
 
-  setInterval(checkGlobalReminder, 10000);
+  setInterval(checkGlobalReminder, 10000); // every 10s maybe can increase it to 1 minute
 });
