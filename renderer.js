@@ -79,7 +79,9 @@ function renderNotes() {
     deleteImg.alt = 'Delete';
     deleteButton.appendChild(deleteImg);
     deleteButton.addEventListener('click', () => {
-      deleteNote(note.id);
+      if (window.confirm("Are you sure you want to delete this note?")) {
+        deleteNote(note.id);
+      }
     });
     noteDiv.appendChild(deleteButton);
 

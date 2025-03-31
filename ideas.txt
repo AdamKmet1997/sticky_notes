@@ -14,6 +14,14 @@ add are you sure to delete pop up when deleting
 
 Add blur note feature for selected notes
 
+Draggable behind a settings Features
+
+sound when reminder opens
+
+speech to text
+
+share notes to cloud and send link
+
 Advanced Features
 Multiple Notes Management:
 Support multiple sticky notes simultaneously, perhaps with a visual way to manage or group them.
