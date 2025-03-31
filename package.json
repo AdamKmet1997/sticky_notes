@@ -6,6 +6,7 @@
   "scripts": {
     "start": "electron .",
     "build": "electron-builder",
+    "grunt": "grunt",
     "lint": "eslint .",
     "format": "prettier --write ."
   },
@@ -19,7 +20,13 @@
     "eslint-config-prettier": "^10.1.1",
     "eslint-plugin-prettier": "^5.2.5",
     "globals": "^16.0.0",
-    "prettier": "^3.5.3"
+    "grunt": "^1.6.1",
+    "grunt-concurrent": "^3.0.0",
+    "grunt-contrib-watch": "^1.1.0",
+    "grunt-run": "^0.8.1",
+    "grunt-sass": "^4.0.0",
+    "prettier": "^3.5.3",
+    "sass": "^1.86.0"
   },
   "build": {
     "appId": "com.adamkmet.stickynotes",
