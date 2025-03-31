@@ -163,18 +163,24 @@ function renderNotes() {
     // Secret button to toggle blur
     const secretButton = document.createElement('button');
     secretButton.classList.add('toggle-button');
-    secretButton.textContent = 'Secret';
     secretButton.style.fontWeight = 'bold';
+
+    // Set the initial blur state based on the note's property
+    if (note.blurred) {
+      textarea.style.filter = 'blur(5px)';
+      previewDiv.style.filter = 'blur(5px)';
+      secretButton.textContent = 'Unblur';
+    } else {
+      textarea.style.filter = 'none';
+      previewDiv.style.filter = 'none';
+      secretButton.textContent = 'Secret';
+    }
+
     secretButton.addEventListener('click', () => {
-      if (textarea.style.filter === 'blur(5px)') {
-        textarea.style.filter = 'none';
-        secretButton.textContent = 'Secret';
-        previewDiv.style.filter = 'none';
-      } else {
-        textarea.style.filter = 'blur(5px)';
-        secretButton.textContent = 'Unblur';
-        previewDiv.style.filter = 'blur(5px)';
-      }
+      // Toggle the blur state in the note object
+      note.blurred = !note.blurred;
+      saveNotes();
+      renderNotes();
     });
     buttonContainer.appendChild(secretButton);
 
@@ -219,6 +225,7 @@ function createNote() {
     content: '',
     created: timestamp,
     pinned: false,
+    blurred: false,
   };
   notes.push(newNote);
   saveNotes();
