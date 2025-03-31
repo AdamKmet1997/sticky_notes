@@ -79,8 +79,12 @@ function renderNotes() {
     deleteImg.alt = 'Delete';
     deleteButton.appendChild(deleteImg);
     deleteButton.addEventListener('click', () => {
-      if (window.confirm("Are you sure you want to delete this note?")) {
-        deleteNote(note.id);
+      if (note.pinned) {
+        window.alert("This note is pinned and cannot be deleted.");
+      } else {
+        if (window.confirm("Are you sure you want to delete this note?")) {
+          deleteNote(note.id);
+        }
       }
     });
     noteDiv.appendChild(deleteButton);
@@ -110,7 +114,7 @@ function renderNotes() {
     // Textarea for editing the note content (Markdown), initially visible
     const textarea = document.createElement('textarea');
     textarea.value = note.content;
-    textarea.style.display = 'block'; // Make edit mode the default
+    textarea.style.display = 'block'; // Default is edit mode
     textarea.addEventListener('input', (event) => {
       updateNoteContent(note.id, event.target.value);
     });
@@ -127,7 +131,7 @@ function renderNotes() {
     previewDiv.innerHTML = marked.parse(note.content);
     contentContainer.appendChild(previewDiv);
 
-    // Container for buttons (Edit/Preview and Secret)
+    // Container for buttons (Edit/Preview, Secret, and Pin)
     const buttonContainer = document.createElement('div');
     buttonContainer.style.display = 'flex';
     buttonContainer.style.gap = '10px';
@@ -136,7 +140,8 @@ function renderNotes() {
     // Toggle button for switching between edit and preview modes
     const toggleButton = document.createElement('button');
     toggleButton.classList.add('toggle-button');
-    toggleButton.textContent = 'Preview'; // Default state is edit mode
+    // Default state is edit mode; button text shows "Preview" to switch to preview mode
+    toggleButton.textContent = 'Preview';
     toggleButton.style.fontWeight = 'bold';
     toggleButton.addEventListener('click', () => {
       if (textarea.style.display === 'none') {
@@ -146,7 +151,7 @@ function renderNotes() {
         toggleButton.textContent = 'Preview';
         textarea.focus();
       } else {
-        // Switch back to preview (read-only) mode: update preview and hide textarea
+        // Switch to preview (read-only) mode: update preview and hide textarea
         previewDiv.innerHTML = marked.parse(textarea.value);
         textarea.style.display = 'none';
         previewDiv.style.display = 'block';
@@ -159,6 +164,7 @@ function renderNotes() {
     const secretButton = document.createElement('button');
     secretButton.classList.add('toggle-button');
     secretButton.textContent = 'Secret';
+    secretButton.style.fontWeight = 'bold';
     secretButton.addEventListener('click', () => {
       if (textarea.style.filter === 'blur(5px)') {
         textarea.style.filter = 'none';
@@ -167,11 +173,28 @@ function renderNotes() {
       } else {
         textarea.style.filter = 'blur(5px)';
         secretButton.textContent = 'Unblur';
-        //also blur for preview
         previewDiv.style.filter = 'blur(5px)';
       }
     });
     buttonContainer.appendChild(secretButton);
+
+    // Pin button to toggle pinned state (cannot be deleted if pinned)
+    const pinButton = document.createElement('button');
+    pinButton.classList.add('toggle-button');
+    const pinImg = document.createElement('img');
+    // Set the icon based on the note's pinned state:
+    pinImg.src = note.pinned ? 'assets/pin.png' : 'assets/pinned.png';
+    // Set tooltip and alt text based on pinned state:
+    pinImg.alt = note.pinned ? 'Unpin Note' : 'Pin Note';
+    pinButton.title = note.pinned ? 'Unpin Note' : 'Pin Note';
+    pinButton.appendChild(pinImg);
+    pinButton.addEventListener('click', () => {
+      note.pinned = !note.pinned;
+      saveNotes();
+      renderNotes();
+    });
+    buttonContainer.appendChild(pinButton);
+
 
     contentContainer.appendChild(buttonContainer);
     noteDiv.appendChild(contentContainer);
@@ -179,7 +202,8 @@ function renderNotes() {
   });
 }
 
-// Create a new note
+
+// Create a new note with a pinned property
 function createNote() {
   console.log('Creating a new note...');
   const timestamp = Date.now();
@@ -188,11 +212,13 @@ function createNote() {
     title: 'New Note',
     content: '',
     created: timestamp,
+    pinned: false, // New property: note is not pinned by default
   };
   notes.push(newNote);
   saveNotes();
   renderNotes();
 }
+
 
 // Update a note's title and auto-save
 function updateNoteTitle(id, title) {
