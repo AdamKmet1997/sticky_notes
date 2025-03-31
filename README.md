@@ -39,7 +39,7 @@ Sticky Notes is a lightweight, cross-platform desktop application built with Ele
 3. Start the development server:
 
 ```bash
-   npm start
+   npm run grunt
 ```
 
 4. To build the app:

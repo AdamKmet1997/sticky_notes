@@ -147,6 +147,7 @@ body {
   border-radius: 50%;
   cursor: pointer;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
 }
 
 #github-link {
@@ -156,6 +157,7 @@ body {
   width: 50px;
   height: 50px;
   cursor: pointer;
+  z-index: 1000;
 }
 #github-link img {
   width: 100%;
