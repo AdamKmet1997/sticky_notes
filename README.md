@@ -19,6 +19,10 @@ Sticky Notes is a lightweight, cross-platform desktop application built with Ele
   Set a global reminder that brings your app to the forefront at a specified time.
 - **System Tray Integration:**  
   Access your notes quickly via a system tray icon, keeping your workspace uncluttered.
+- **Export Notes as json**
+  User is able to expand the side navigation bar and export their notes into a json format file.
+- **Pin comments**
+  Pinned comments cannot be deleted, giving user extra security
 
 ---
 
