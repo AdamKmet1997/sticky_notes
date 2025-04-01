@@ -5,9 +5,9 @@ const { app, BrowserWindow, Tray, Menu, ipcMain } = require('electron');
 const path = require('path');
 
 // For hot reload during development (optional)
-require('electron-reload')(__dirname, {
-  electron: require(path.join(__dirname, 'node_modules', 'electron')),
-});
+// require('electron-reload')(__dirname, {
+//   electron: require(path.join(__dirname, 'node_modules', 'electron')),
+// });
 
 let tray = null;
 let window = null;
