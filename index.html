@@ -12,16 +12,27 @@
         <input id="global-reminder" type="datetime-local" />
       </div>
     </div>
+
+    <!-- Main Add Note button -->
     <button id="new-note">
       <img src="assets/add.png" alt="Add Note" />
     </button>
-    <a
-      id="github-link"
-      href="https://github.com/AdamKmet1997/sticky_notes"
-      target="_blank"
-    >
-      <img src="assets/github.png" alt="GitHub Repository" />
-    </a>
+    
+    <!-- Menu button to open the side panel -->
+    <button id="menu-button">
+      <img src="assets/menu.png" alt="Menu" />
+    </button>
+    
+    <!-- Side menu panel (hidden offscreen initially) -->
+    <div id="side-menu">
+      <button id="export-notes">
+        <img src="assets/export.png" alt="Export Notes" />
+      </button>
+      <a id="github-link" href="https://github.com/AdamKmet1997/sticky_notes" target="_blank">
+        <img src="assets/github.png" alt="GitHub Repository" />
+      </a>
+    </div>
+
     <div id="notes-container"></div>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="renderer.js"></script>

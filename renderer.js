@@ -111,24 +111,32 @@ function renderNotes() {
     contentContainer.style.display = 'flex';
     contentContainer.style.flexDirection = 'column';
 
-    // Textarea for editing the note content (Markdown), initially visible
+    // Textarea for editing the note content (Markdown)
     const textarea = document.createElement('textarea');
     textarea.value = note.content;
-    textarea.style.display = 'block'; // Default is edit mode
-    textarea.addEventListener('input', (event) => {
-      updateNoteContent(note.id, event.target.value);
-    });
-    contentContainer.appendChild(textarea);
-
-    // Div for rendered Markdown preview (default hidden)
+    // Div for rendered Markdown preview
     const previewDiv = document.createElement('div');
     previewDiv.classList.add('preview');
-    previewDiv.style.display = 'none'; // Hide preview mode by default
     previewDiv.style.flexGrow = '1';
     previewDiv.style.overflowY = 'auto';
     previewDiv.style.padding = '5px';
     previewDiv.style.backgroundColor = 'transparent';
-    previewDiv.innerHTML = marked.parse(note.content);
+
+    // Set initial display based on the note's preview state
+    if (note.preview) {
+      textarea.style.display = 'none';
+      previewDiv.style.display = 'block';
+      previewDiv.innerHTML = marked.parse(note.content);
+    } else {
+      textarea.style.display = 'block';
+      previewDiv.style.display = 'none';
+    }
+
+    textarea.addEventListener('input', (event) => {
+      updateNoteContent(note.id, event.target.value);
+    });
+
+    contentContainer.appendChild(textarea);
     contentContainer.appendChild(previewDiv);
 
     // Container for buttons (Edit/Preview, Secret, and Pin)
@@ -140,23 +148,27 @@ function renderNotes() {
     // Toggle button for switching between edit and preview modes
     const toggleButton = document.createElement('button');
     toggleButton.classList.add('toggle-button');
-    // Default state is edit mode; button text shows "Preview" to switch to preview mode
-    toggleButton.textContent = 'Preview';
     toggleButton.style.fontWeight = 'bold';
+    // Set button text based on current preview state
+    toggleButton.textContent = note.preview ? 'Edit' : 'Preview';
     toggleButton.addEventListener('click', () => {
-      if (textarea.style.display === 'none') {
-        // Switch to edit mode: show textarea, hide preview
+      if (note.preview) {
+        // Switch from preview mode to edit mode
         textarea.style.display = 'block';
         previewDiv.style.display = 'none';
         toggleButton.textContent = 'Preview';
+        note.preview = false;
         textarea.focus();
       } else {
-        // Switch to preview (read-only) mode: update preview and hide textarea
+        // Switch from edit mode to preview mode
         previewDiv.innerHTML = marked.parse(textarea.value);
         textarea.style.display = 'none';
         previewDiv.style.display = 'block';
         toggleButton.textContent = 'Edit';
+        note.preview = true;
       }
+      // Persist the preview state
+      saveNotes();
     });
     buttonContainer.appendChild(toggleButton);
 
@@ -165,7 +177,6 @@ function renderNotes() {
     secretButton.classList.add('toggle-button');
     secretButton.style.fontWeight = 'bold';
 
-    // Set the initial blur state based on the note's property
     if (note.blurred) {
       textarea.style.filter = 'blur(5px)';
       previewDiv.style.filter = 'blur(5px)';
@@ -177,7 +188,6 @@ function renderNotes() {
     }
 
     secretButton.addEventListener('click', () => {
-      // Toggle the blur state in the note object
       note.blurred = !note.blurred;
       saveNotes();
       renderNotes();
@@ -188,12 +198,9 @@ function renderNotes() {
     const pinButton = document.createElement('button');
     pinButton.classList.add('toggle-button');
     const pinImg = document.createElement('img');
-    // Set the icon based on the note's pinned state:
     pinImg.src = note.pinned ? 'assets/pin.png' : 'assets/pinned.png';
-    // Set tooltip and alt text based on pinned state:
     pinImg.alt = note.pinned ? 'Unpin Note' : 'Pin Note';
     pinButton.title = note.pinned ? 'Unpin Note' : 'Pin Note';
-    // if pinned add red border around the note
     if (note.pinned) {
       noteDiv.style.border = '2px solid red';
     } else {
@@ -207,15 +214,13 @@ function renderNotes() {
     });
     buttonContainer.appendChild(pinButton);
 
-
     contentContainer.appendChild(buttonContainer);
     noteDiv.appendChild(contentContainer);
     container.appendChild(noteDiv);
   });
 }
 
-
-// Create a new note
+// Create a new note with preview defaulting to edit mode (preview: false)
 function createNote() {
   console.log('Creating a new note...');
   const timestamp = Date.now();
@@ -226,12 +231,12 @@ function createNote() {
     created: timestamp,
     pinned: false,
     blurred: false,
+    preview: false
   };
   notes.push(newNote);
   saveNotes();
   renderNotes();
 }
-
 
 // Update a note's title and auto-save
 function updateNoteTitle(id, title) {
@@ -310,6 +315,36 @@ document.addEventListener('DOMContentLoaded', () => {
     console.error('New Note button not found.');
   }
 
+  const menuButton = document.getElementById('menu-button');
+  const sideMenu = document.getElementById('side-menu');
+
+  menuButton.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (sideMenu.style.right === '0px') {
+      sideMenu.style.right = '-30%';
+    } else {
+      sideMenu.style.right = '0px';
+    }
+  });
+
+  sideMenu.addEventListener('click', (e) => {
+    e.stopPropagation();
+  });
+
+  document.addEventListener('click', () => {
+    if (sideMenu.style.right === '0px') {
+      sideMenu.style.right = '-30%';
+    }
+  });
+
+  const exportButton = document.getElementById('export-notes');
+  if (exportButton) {
+    exportButton.addEventListener('click', exportNotesAsJSON);
+    console.log('Export button found.');
+  } else {
+    console.error('Export button not found.');
+  }
+
   const searchInput = document.getElementById('search-input');
   if (searchInput) {
     searchInput.addEventListener('input', handleSearch);
@@ -331,5 +366,19 @@ document.addEventListener('DOMContentLoaded', () => {
   loadNotes();
   renderNotes();
 
-  setInterval(checkGlobalReminder, 10000); // every 10s maybe can increase it to 1 minute
+  setInterval(checkGlobalReminder, 10000); // every 10s; adjust as needed
 });
+
+// Export notes as a JSON file
+function exportNotesAsJSON() {
+  const jsonContent = JSON.stringify(notes, null, 2);
+  const blob = new Blob([jsonContent], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.setAttribute("href", url);
+  link.setAttribute("download", "notes_export.json");
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}

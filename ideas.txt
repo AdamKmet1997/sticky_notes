@@ -19,7 +19,7 @@ Draggable behind a settings Features
 sound when reminder opens
 
 speech to text
-Bluer text when sharing a screen
+Blur text when sharing a screen
 
 share notes to cloud and send link
 
