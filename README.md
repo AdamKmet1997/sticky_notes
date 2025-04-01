@@ -4,6 +4,7 @@ Sticky Notes is a lightweight, cross-platform desktop application built with Ele
 
 ![Sticky Notes App](assets/app_v1.1.2.png)
 
+
 ## Features
 
 - **Create and Manage Notes:**  
