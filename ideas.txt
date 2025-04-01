@@ -8,6 +8,9 @@ Automatically save changes (using localStorage, files, or a database) so that no
 Draggable & Resizable Notes:
 Let users reposition and resize individual notes on their screen for a personalized layout.
 
+ALLOW USER TO UPLOAD THEIR JSON AND POPULATE THE NOTES
+
+
 Add Pin note so it cant be deleted while pinned DONE
 
 add are you sure to delete pop up when deleting DONE
@@ -23,33 +26,6 @@ Blur text when sharing a screen
 
 share notes to cloud and send link
 
-Advanced Features
-Multiple Notes Management:
-Support multiple sticky notes simultaneously, perhaps with a visual way to manage or group them.
 
-Customization Options:
-Enable users to change note colors, fonts, and themes (like light/dark mode) for a tailored experience.
-
-Search and Filter: DONE
-Implement a search functionality so users can quickly find specific notes by keywords or tags.
-
-Synchronization:
-Optionally, add cloud syncing or integration with other services so users can access their notes across devices.
-
-Export/Backup:
-Provide an option to export notes to a file (e.g., PDF or text format) or back them up for added security.
-
-Context Menu/Quick Actions:
-Include right-click menus or quick action buttons for common tasks like pinning a note, changing its color, or clearing its content.
-
-User Experience Enhancements
-Drop-Down Animation:
-If the app is accessed via the status bar, implement smooth animations for showing/hiding notes to mimic a natural drop-down effect.
-
-Minimal UI:
-Keep the interface clean and distraction-free, focusing on the note content.
-
-Notifications/Reminders:
-(Optional) Allow users to set reminders or notifications related to a note.
 
 Reminder timer: DONE
