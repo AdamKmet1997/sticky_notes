@@ -110,6 +110,8 @@ function renderNotes() {
     contentContainer.style.flexGrow = '1';
     contentContainer.style.display = 'flex';
     contentContainer.style.flexDirection = 'column';
+    // Adding this fixes overflow in flex children
+    contentContainer.style.minHeight = '0';
 
     // Textarea for editing the note content (Markdown)
     const textarea = document.createElement('textarea');
