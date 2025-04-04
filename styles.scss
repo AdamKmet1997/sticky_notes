@@ -25,8 +25,6 @@ body {
     flex: 1;
     padding: 8px;
     font-size: $font-size-input;
-    border: 1px solid #ddd;
-    border-radius: $border-radius-input;
   }
 }
 
@@ -71,7 +69,7 @@ body {
 #notes-container {
   display: flex;
   flex-wrap: wrap;
-  gap: 15px;
+  gap: 1rem;
 }
 
 /* Note card styles (unchanged) */
@@ -79,7 +77,6 @@ body {
   width: 220px;
   height: 280px;
   background-color: #fffab3;
-  border: 1px solid #ccc;
   border-radius: 8px;
   padding: 10px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -94,7 +91,6 @@ body {
 
   .delete-button {
     position: absolute;
-    top: 8px;
     right: 8px;
     cursor: pointer;
     
@@ -109,7 +105,6 @@ body {
     font-size: 18px;
     font-weight: bold;
     padding: 5px;
-    margin-bottom: 5px;
     border: none;
     background-color: transparent;
 
@@ -177,13 +172,11 @@ body {
   position: fixed;
   bottom: 20px;
   right: 20px;
-  width: 50px;
-  height: 50px;
   background-color: transparent;
   border: none;
   img {
-    width: 50px;
-    height: 50px;
+    width: 40px;
+    height: 40px;
   }
 }
 
@@ -193,32 +186,25 @@ body {
   bottom: 15%;
   right: -30%;
   width: 30%;
-  height: 30%;
   background-color: #f9f9c6;
   box-shadow: -2px 0 4px rgba(0, 0, 0, 0.2);
   transition: right 0.3s ease-in-out;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding-top: 20px;
   z-index: 1100;
-  // round edges on the left side
   border-top-left-radius: 20px;
   border-bottom-left-radius: 20px;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  gap: 2rem;
 }
 
 /* Styling for buttons inside the side menu */
 #side-menu button,
 #side-menu a {
   margin: 10px 0;
-  width: 50px;
-  height: 50px;
+  height: 40px;
   border: none;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-decoration: none;
   background-color: transparent;
   img {
     width: 100%;
