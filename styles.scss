@@ -84,7 +84,8 @@ body {
   flex-direction: column;
   position: relative;
   transition: box-shadow 0.2s ease;
-
+  resize: both;
+  overflow: auto;
   &:hover {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   }
@@ -174,6 +175,7 @@ body {
   right: 20px;
   background-color: transparent;
   border: none;
+  z-index: 1000;
   img {
     width: 40px;
     height: 40px;

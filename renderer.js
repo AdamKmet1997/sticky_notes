@@ -71,6 +71,20 @@ function renderNotes() {
     noteDiv.classList.add('note');
     noteDiv.setAttribute('data-id', note.id);
 
+    // Apply saved dimensions 
+    if (note.width && note.height) {
+      noteDiv.style.width = `${note.width}px`;
+      noteDiv.style.height = `${note.height}px`;
+    }
+
+    // Add resize event listener to save dimensions
+    noteDiv.addEventListener('mouseleave', () => {
+      const rect = noteDiv.getBoundingClientRect();
+      note.width = rect.width;
+      note.height = rect.height;
+      saveNotes();
+    });
+
     // Delete button using the x.png icon
     const deleteButton = document.createElement('div');
     deleteButton.classList.add('delete-button');
