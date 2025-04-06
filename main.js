@@ -72,8 +72,7 @@ function toggleWindow() {
 function showWindow() {
   const trayBounds = tray.getBounds();
   const windowBounds = window.getBounds();
-  const screenBounds = screen.getPrimaryDisplay().workArea;
-
+  const screenBounds = screen.getDisplayMatching(trayBounds).workArea;
   // Calculate center positions, used to determine where to place the app window
   const trayCenterX = trayBounds.x + trayBounds.width / 2;
   const trayCenterY = trayBounds.y + trayBounds.height / 2;
