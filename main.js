@@ -1,7 +1,7 @@
 /* eslint-env node */
 /* global __dirname, process */
 
-const { app, BrowserWindow, Tray, Menu, ipcMain } = require('electron');
+const { app, BrowserWindow, Tray, Menu, ipcMain, screen } = require('electron');
 const path = require('path');
 
 // For hot reload during development (optional)
@@ -72,12 +72,33 @@ function toggleWindow() {
 function showWindow() {
   const trayBounds = tray.getBounds();
   const windowBounds = window.getBounds();
-  const x = Math.round(
-    trayBounds.x + trayBounds.width / 2 - windowBounds.width / 2
-  );
-  const y = Math.round(trayBounds.y + trayBounds.height);
+  const screenBounds = screen.getDisplayMatching(trayBounds).workArea;
+  // Calculate center positions, used to determine where to place the app window
+  const trayCenterX = trayBounds.x + trayBounds.width / 2;
+  const trayCenterY = trayBounds.y + trayBounds.height / 2;
 
-  window.setPosition(x, y, false);
+  const screenCenterX = screenBounds.x + screenBounds.width / 2;
+  const screenCenterY = screenBounds.y + screenBounds.height / 2;
+
+  const isTop = trayCenterY < screenCenterY;
+  const isLeft = trayCenterX < screenCenterX;
+
+  let x = 0;
+  let y = 0;
+
+  if (isLeft) {
+    x = screenBounds.x;
+  } else {
+    x = screenBounds.x + screenBounds.width - windowBounds.width;
+  }
+
+  if (isTop) {
+    y = screenBounds.y;
+  } else {
+    y = screenBounds.y + screenBounds.height - windowBounds.height;
+  }
+
+  window.setPosition(Math.round(x), Math.round(y), false);
   window.show();
   window.focus();
 }
