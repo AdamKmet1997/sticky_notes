@@ -1,31 +1,28 @@
-Core Features
-Create, Edit, and Delete Notes: DONE
-Allow users to easily add new notes, modify existing ones, and remove notes they no longer need.
+- Let users reposition and resize individual notes on their screen for a personalized layout.
 
-Auto-Save/Persistence:DONE
-Automatically save changes (using localStorage, files, or a database) so that notes are preserved between sessions.
+- ALLOW USER TO UPLOAD THEIR JSON AND POPULATE THE NOTES
 
-Draggable & Resizable Notes:
-Let users reposition and resize individual notes on their screen for a personalized layout.
+- Draggable behind a settings Features
 
-ALLOW USER TO UPLOAD THEIR JSON AND POPULATE THE NOTES
+- Sound when reminder opens
 
+- Blur text when sharing a screen
 
-Add Pin note so it cant be deleted while pinned DONE
+- Allow users to group notes into folders or categories for better organization.
+ ( User can right click on Add note button and options come up with choices like note color,note group...),
+ then somehow organise notes in folders or some structure
 
-add are you sure to delete pop up when deleting DONE
+- Enable users to resize notes dynamically.
 
-Add blur note feature for selected notes DONE
+- When filtering/searching for notes, highlight the found word as well
 
-Draggable behind a settings Features
+- Import notes from exported JSON (useful if I want to export my notes on one device and import on other)
 
-sound when reminder opens
+- Allow users to lock specific notes with a password.
+ ( Add support for fingerprint authentication for accessing the app.)
 
-speech to text
-Blur text when sharing a screen
+- Notifications, (keep the current where app opens or maybe keep closed and add red dot??)
 
-share notes to cloud and send link
+- Reoccuring reminders ie. every day at 10am
 
-
-
-Reminder timer: DONE
+- Provide pre-defined templates for common use cases (e.g., to-do lists, meeting notes).
