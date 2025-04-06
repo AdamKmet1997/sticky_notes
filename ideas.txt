@@ -2,6 +2,8 @@
 
 - ALLOW USER TO UPLOAD THEIR JSON AND POPULATE THE NOTES
 
+- Integration with Calendars and To-Do Lists:
+
 - Draggable behind a settings Features
 
 - Sound when reminder opens
@@ -19,7 +21,7 @@
 - Import notes from exported JSON (useful if I want to export my notes on one device and import on other)
 
 - Allow users to lock specific notes with a password.
- ( Add support for fingerprint authentication for accessing the app.)
+ ( Add support for fingerprint authentication for accessing the app. make optional in setting)
 
 - Notifications, (keep the current where app opens or maybe keep closed and add red dot??)
 
