@@ -71,6 +71,20 @@ function renderNotes() {
     noteDiv.classList.add('note');
     noteDiv.setAttribute('data-id', note.id);
 
+    // Apply saved dimensions 
+    if (note.width && note.height) {
+      noteDiv.style.width = `${note.width}px`;
+      noteDiv.style.height = `${note.height}px`;
+    }
+
+    // Add resize event listener to save dimensions
+    noteDiv.addEventListener('mouseleave', () => {
+      const rect = noteDiv.getBoundingClientRect();
+      note.width = rect.width;
+      note.height = rect.height;
+      saveNotes();
+    });
+
     // Delete button using the x.png icon
     const deleteButton = document.createElement('div');
     deleteButton.classList.add('delete-button');
@@ -188,11 +202,19 @@ function renderNotes() {
       previewDiv.style.filter = 'none';
       secretButton.textContent = 'Secret';
     }
-
     secretButton.addEventListener('click', () => {
       note.blurred = !note.blurred;
       saveNotes();
-      renderNotes();
+      // Update the UI directly without re-rendering the whole note
+      if (note.blurred) {
+        textarea.style.filter = 'blur(5px)';
+        previewDiv.style.filter = 'blur(5px)';
+        secretButton.textContent = 'Unblur';
+      } else {
+        textarea.style.filter = 'none';
+        previewDiv.style.filter = 'none';
+        secretButton.textContent = 'Secret';
+      }
     });
     buttonContainer.appendChild(secretButton);
 
