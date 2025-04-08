@@ -202,11 +202,19 @@ function renderNotes() {
       previewDiv.style.filter = 'none';
       secretButton.textContent = 'Secret';
     }
-
     secretButton.addEventListener('click', () => {
       note.blurred = !note.blurred;
       saveNotes();
-      renderNotes();
+      // Update the UI directly without re-rendering the whole note
+      if (note.blurred) {
+        textarea.style.filter = 'blur(5px)';
+        previewDiv.style.filter = 'blur(5px)';
+        secretButton.textContent = 'Unblur';
+      } else {
+        textarea.style.filter = 'none';
+        previewDiv.style.filter = 'none';
+        secretButton.textContent = 'Secret';
+      }
     });
     buttonContainer.appendChild(secretButton);
 

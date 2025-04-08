@@ -58,8 +58,9 @@ body {
 
 /* Note card styles (unchanged) */
 .note {
-  width: 220px;
-  height: 280px;
+  min-width: 220px;
+  min-height: 280px;
+  box-sizing: border-box;
   background-color: #fffab3;
   border-radius: 8px;
   padding: 10px;
