@@ -36,8 +36,8 @@ ipcMain.on('show-window', () => {
 
 function createWindow() {
   window = new BrowserWindow({
-    width: 600,
-    height: 600,
+    minWidth: 600,
+    minHeight: 600,
     show: false,
     frame: false,
     resizable: true,
