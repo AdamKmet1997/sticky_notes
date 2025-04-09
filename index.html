@@ -23,15 +23,21 @@
       <img src="assets/menu.png" alt="Menu" title="Open the side menu"/>
     </button>
     
-    <!-- Side menu panel (hidden offscreen initially) -->
     <div id="side-menu">
       <button id="export-notes" title="Export your notes as a JSON file">
         <img src="assets/export.png" alt="Export Notes" />
+      </button>
+      <!-- Import button for notes -->
+      <button id="import-notes" title="Import notes from a JSON file">
+        <img src="assets/import.png" alt="Import Notes" />
       </button>
       <a id="github-link" href="https://github.com/AdamKmet1997/sticky_notes" target="_blank" title="View the GitHub Repository">
         <img src="assets/github.png" alt="GitHub Repository" />
       </a>
     </div>
+    
+    <!-- Hidden file input for importing notes -->
+    <input type="file" id="file-input" accept="application/json" style="display: none;">
 
     <div id="notes-container"></div>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
