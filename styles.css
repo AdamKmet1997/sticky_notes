@@ -56,7 +56,7 @@ body {
   gap: 1rem;
 }
 
-/* Note card styles (unchanged) */
+/* Note card styling */
 .note {
   min-width: 220px;
   min-height: 280px;
@@ -114,12 +114,36 @@ body {
   flex-grow: 1;
   overflow-y: auto;
   padding: 5px;
-  background-color: #fff;
+  background-color: transparent;
   border: none;
 }
 
-.toggle-button {
+/* Pinned notes get a red border */
+.note.pinned-note {
+  border: 2px solid red;
+}
+
+/* Utility class to hide elements */
+.hidden {
+  display: none !important;
+}
+
+/* Content container */
+.content-container {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+/* Button container styling */
+.button-container {
+  display: flex;
+  gap: 10px;
   margin-top: 5px;
+}
+
+.toggle-button {
   background: none;
   border: none;
   cursor: pointer;
@@ -130,7 +154,7 @@ body {
   height: 20px;
 }
 
-/* Fixed position for Add Note button */
+/* Fixed button styles */
 #new-note {
   position: fixed;
   bottom: 20px;
@@ -145,7 +169,6 @@ body {
   z-index: 1000;
 }
 
-/* Fixed position for Menu button (replacing the GitHub button) */
 #menu-button {
   position: fixed;
   bottom: 20px;
@@ -159,7 +182,7 @@ body {
   height: 40px;
 }
 
-/* Side menu that slides in from the right */
+/* Side menu styling */
 #side-menu {
   position: fixed;
   bottom: 15%;
@@ -177,7 +200,12 @@ body {
   gap: 2rem;
 }
 
-/* Styling for buttons inside the side menu */
+/* When side menu is open */
+#side-menu.open {
+  right: 0;
+}
+
+/* Side menu internal button/link styling */
 #side-menu button,
 #side-menu a {
   margin: 10px 0;
