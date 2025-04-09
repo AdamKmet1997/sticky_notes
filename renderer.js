@@ -87,7 +87,7 @@ function renderNotes() {
       noteDiv.classList.remove('pinned-note');
     }
 
-    // Apply saved dimensions if they exist; these are applied inline as they are dynamic
+    // Apply saved dimensions if available (applied inline as they are dynamic)
     if (note.width && note.height) {
       noteDiv.style.width = `${note.width}px`;
       noteDiv.style.height = `${note.height}px`;
@@ -144,7 +144,7 @@ function renderNotes() {
     textarea.value = note.content;
     textarea.classList.add('note-textarea');
 
-    // Create preview div for rendering Markdown (hidden initially)
+    // Create preview div for rendered Markdown (hidden initially)
     const previewDiv = document.createElement('div');
     previewDiv.classList.add('preview');
 
@@ -194,14 +194,14 @@ function renderNotes() {
     });
     buttonContainer.appendChild(toggleButton);
 
-    // Create secret button for toggling the blur effect on the note content
+    // Create secret button (for toggling blur)
     const secretButton = document.createElement('button');
     secretButton.classList.add('toggle-button');
     secretButton.textContent = note.blurred ? 'Unblur' : 'Secret';
     secretButton.addEventListener('click', () => {
       note.blurred = !note.blurred;
       saveNotes();
-      // Update the blur style directly without re-rendering
+      // Update blur styles directly without re-rendering the whole note
       if (note.blurred) {
         textarea.style.filter = 'blur(5px)';
         previewDiv.style.filter = 'blur(5px)';
@@ -218,16 +218,30 @@ function renderNotes() {
     const pinButton = document.createElement('button');
     pinButton.classList.add('toggle-button');
     const pinImg = document.createElement('img');
-    // Use different images depending on whether the note is pinned
+    // Use different images based on pinned state
     pinImg.src = note.pinned ? 'assets/pin.png' : 'assets/pinned.png';
     pinImg.alt = note.pinned ? 'Unpin Note' : 'Pin Note';
     pinButton.title = note.pinned ? 'Unpin Note' : 'Pin Note';
     pinButton.appendChild(pinImg);
     pinButton.addEventListener('click', () => {
+      // Toggle the pinned state on the note
       note.pinned = !note.pinned;
+      // Save the updated note
       saveNotes();
-      // Re-render notes to update the pinned class and red border
-      renderNotes();
+      // Update the DOM directly without a full re-render:
+      if (note.pinned) {
+        // Add the pinned-note class to get the red border and update pin icon
+        noteDiv.classList.add('pinned-note');
+        pinImg.src = 'assets/pin.png';
+        pinImg.alt = 'Unpin Note';
+        pinButton.title = 'Unpin Note';
+      } else {
+        // Remove the pinned-note class and update the pin icon
+        noteDiv.classList.remove('pinned-note');
+        pinImg.src = 'assets/pinned.png';
+        pinImg.alt = 'Pin Note';
+        pinButton.title = 'Pin Note';
+      }
     });
     buttonContainer.appendChild(pinButton);
 
