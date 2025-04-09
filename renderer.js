@@ -87,7 +87,7 @@ function renderNotes() {
       noteDiv.classList.remove('pinned-note');
     }
 
-    // Apply saved dimensions if they exist; these are applied inline as they are dynamic
+    // Apply saved dimensions if available (applied inline as they are dynamic)
     if (note.width && note.height) {
       noteDiv.style.width = `${note.width}px`;
       noteDiv.style.height = `${note.height}px`;
@@ -144,7 +144,7 @@ function renderNotes() {
     textarea.value = note.content;
     textarea.classList.add('note-textarea');
 
-    // Create preview div for rendering Markdown (hidden initially)
+    // Create preview div for rendered Markdown (hidden initially)
     const previewDiv = document.createElement('div');
     previewDiv.classList.add('preview');
 
@@ -194,14 +194,14 @@ function renderNotes() {
     });
     buttonContainer.appendChild(toggleButton);
 
-    // Create secret button for toggling the blur effect on the note content
+    // Create secret button (for toggling blur)
     const secretButton = document.createElement('button');
     secretButton.classList.add('toggle-button');
     secretButton.textContent = note.blurred ? 'Unblur' : 'Secret';
     secretButton.addEventListener('click', () => {
       note.blurred = !note.blurred;
       saveNotes();
-      // Update the blur style directly without re-rendering
+      // Update blur styles directly without re-rendering the whole note
       if (note.blurred) {
         textarea.style.filter = 'blur(5px)';
         previewDiv.style.filter = 'blur(5px)';
@@ -218,7 +218,7 @@ function renderNotes() {
     const pinButton = document.createElement('button');
     pinButton.classList.add('toggle-button');
     const pinImg = document.createElement('img');
-    // Use different images depending on whether the note is pinned
+    // Use different images based on pinned state
     pinImg.src = note.pinned ? 'assets/pin.png' : 'assets/pinned.png';
     pinImg.alt = note.pinned ? 'Unpin Note' : 'Pin Note';
     pinButton.title = note.pinned ? 'Unpin Note' : 'Pin Note';
@@ -226,7 +226,7 @@ function renderNotes() {
     pinButton.addEventListener('click', () => {
       note.pinned = !note.pinned;
       saveNotes();
-      // Re-render notes to update the pinned class and red border
+      // Re-render to update pinned styles and red border
       renderNotes();
     });
     buttonContainer.appendChild(pinButton);
@@ -346,7 +346,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const sideMenu = document.getElementById('side-menu');
   menuButton.addEventListener('click', (e) => {
     e.stopPropagation();
-    // Toggle the open state using the 'open' class
+    // Toggle side menu open state by adding/removing the 'open' class
     if (sideMenu.classList.contains('open')) {
       sideMenu.classList.remove('open');
     } else {
@@ -354,12 +354,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+  // Prevent clicks inside the side menu from closing it
   sideMenu.addEventListener('click', (e) => { e.stopPropagation(); });
+  // Clicking outside the side menu closes it
   document.addEventListener('click', () => {
     sideMenu.classList.remove('open');
   });
 
-  // Export button within the side menu
+  // Export button functionality
   const exportButton = document.getElementById('export-notes');
   if (exportButton) {
     exportButton.addEventListener('click', exportNotesAsJSON);
@@ -367,6 +369,44 @@ document.addEventListener('DOMContentLoaded', () => {
   } else {
     console.error('Export button not found.');
   }
+
+// Setup Import functionality:
+const importButton = document.getElementById('import-notes');
+const fileInput = document.getElementById('file-input');
+if (importButton && fileInput) {
+  // When import button is clicked, simulate a click on the hidden file input.
+  importButton.addEventListener('click', (e) => {
+    e.stopPropagation();
+    fileInput.click();
+  });
+
+  // When a file is selected, read its contents and parse as JSON.
+  fileInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const importedNotes = JSON.parse(event.target.result);
+        // Merge imported notes with the existing ones:
+        // Option 1: Simply append them:
+        notes = notes.concat(importedNotes);
+
+        saveNotes();
+        renderNotes();
+        alert('Notes imported and merged successfully.');
+      } catch (err) {
+        alert('Error importing file: ' + err.message);
+      }
+    };
+    reader.readAsText(file);
+    // Clear input value so the same file can be re-imported if needed
+    fileInput.value = '';
+  });
+} else {
+  console.error('Import functionality elements not found.');
+}
+
 
   // Search input field
   const searchInput = document.getElementById('search-input');
@@ -391,8 +431,8 @@ document.addEventListener('DOMContentLoaded', () => {
   // Load saved notes and render them
   loadNotes();
   renderNotes();
-  // Set up periodic check for global reminder
-  setInterval(checkGlobalReminder, 10000); // every 10 seconds
+  // Set up periodic check for global reminder (every 10 seconds)
+  setInterval(checkGlobalReminder, 10000);
 });
 
 /**

@@ -14,11 +14,7 @@
  ( User can right click on Add note button and options come up with choices like note color,note group...),
  then somehow organise notes in folders or some structure
 
-- Enable users to resize notes dynamically.
-
 - When filtering/searching for notes, highlight the found word as well
-
-- Import notes from exported JSON (useful if I want to export my notes on one device and import on other)
 
 - Allow users to lock specific notes with a password.
  ( Add support for fingerprint authentication for accessing the app. make optional in setting)
