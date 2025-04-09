@@ -4,13 +4,13 @@
 // Array to hold all notes
 let notes = [];
 
-// Global reminder variable
-let globalReminder = null; // Timestamp (in ms) or null
+// Global reminder variable (stored in milliseconds, null if unset)
+let globalReminder = null;
 
-// Current search query
+// Variable for keeping track of the current search query
 let searchQuery = '';
 
-// Debounce utility function
+// Debounce utility function, prevents rapid execution of functions (e.g., during typing)
 function debounce(func, delay) {
   let timeout;
   return function (...args) {
@@ -19,10 +19,12 @@ function debounce(func, delay) {
   };
 }
 
-// Debounced saveNotes function
+// Create a debounced version of saveNotes to limit how often notes are saved
 const debouncedSaveNotes = debounce(saveNotes, 300);
 
-// Load notes from localStorage on startup
+/**
+ * Loads notes and global reminder from localStorage.
+ */
 function loadNotes() {
   const savedNotes = localStorage.getItem('notes');
   if (savedNotes) {
@@ -35,14 +37,16 @@ function loadNotes() {
   } else {
     notes = [];
   }
-  // Load global reminder from localStorage (if set)
+  // Load global reminder if set
   const savedGlobalReminder = localStorage.getItem('globalReminder');
   if (savedGlobalReminder) {
     globalReminder = parseInt(savedGlobalReminder, 10);
   }
 }
 
-// Save notes and global reminder to localStorage
+/**
+ * Saves notes and global reminder to localStorage.
+ */
 function saveNotes() {
   localStorage.setItem('notes', JSON.stringify(notes));
   if (globalReminder) {
@@ -52,10 +56,13 @@ function saveNotes() {
   }
 }
 
-// Render the notes list, filtered by the search query
+/**
+ * Renders all notes to the DOM. It filters notes based on the search query,
+ * creates DOM elements for each note, and assigns classes for styling.
+ */
 function renderNotes() {
   const container = document.getElementById('notes-container');
-  container.innerHTML = ''; // Clear previous notes
+  container.innerHTML = ''; // Clear any previous content
 
   // Filter notes based on the search query
   const filteredNotes = notes.filter((note) => {
@@ -66,26 +73,35 @@ function renderNotes() {
     );
   });
 
+  // Create DOM elements for each filtered note
   filteredNotes.forEach((note) => {
+    // Create the main note container
     const noteDiv = document.createElement('div');
     noteDiv.classList.add('note');
     noteDiv.setAttribute('data-id', note.id);
 
-    // Apply saved dimensions 
+    // Add the pinned-note class if the note is pinned (to show a red border)
+    if (note.pinned) {
+      noteDiv.classList.add('pinned-note');
+    } else {
+      noteDiv.classList.remove('pinned-note');
+    }
+
+    // Apply saved dimensions if they exist; these are applied inline as they are dynamic
     if (note.width && note.height) {
       noteDiv.style.width = `${note.width}px`;
       noteDiv.style.height = `${note.height}px`;
     }
 
-    // Add resize event listener to save dimensions
+    // Save dimensions on resize: update note dimensions when mouse leaves the note
     noteDiv.addEventListener('mouseleave', () => {
       const rect = noteDiv.getBoundingClientRect();
-      note.width = rect.width;
-      note.height = rect.height;
+      note.width = Math.round(rect.width);
+      note.height = Math.round(rect.height);
       saveNotes();
     });
 
-    // Delete button using the x.png icon
+    // Create delete button with an image icon
     const deleteButton = document.createElement('div');
     deleteButton.classList.add('delete-button');
     const deleteImg = document.createElement('img');
@@ -93,6 +109,7 @@ function renderNotes() {
     deleteImg.alt = 'Delete';
     deleteButton.appendChild(deleteImg);
     deleteButton.addEventListener('click', () => {
+      // Prevent deleting a pinned note
       if (note.pinned) {
         window.alert("This note is pinned and cannot be deleted.");
       } else {
@@ -103,7 +120,7 @@ function renderNotes() {
     });
     noteDiv.appendChild(deleteButton);
 
-    // Title input for the note (first line)
+    // Create title input for the note's title
     const titleInput = document.createElement('input');
     titleInput.classList.add('note-title');
     titleInput.value = note.title;
@@ -112,42 +129,36 @@ function renderNotes() {
     });
     noteDiv.appendChild(titleInput);
 
-    // Display creation date
+    // Display creation date of the note
     const createdDiv = document.createElement('div');
     createdDiv.classList.add('created');
-    createdDiv.textContent =
-      'Created: ' + new Date(note.created).toLocaleString();
+    createdDiv.textContent = 'Created: ' + new Date(note.created).toLocaleString();
     noteDiv.appendChild(createdDiv);
 
-    // Create a container for content editing and preview toggle
+    // Create content container (holds editing area and preview)
     const contentContainer = document.createElement('div');
-    contentContainer.style.flexGrow = '1';
-    contentContainer.style.display = 'flex';
-    contentContainer.style.flexDirection = 'column';
-    // Adding this fixes overflow in flex children
-    contentContainer.style.minHeight = '0';
+    contentContainer.classList.add('content-container');
 
-    // Textarea for editing the note content (Markdown)
+    // Create textarea element for note editing (Markdown)
     const textarea = document.createElement('textarea');
     textarea.value = note.content;
-    // Div for rendered Markdown preview
+    textarea.classList.add('note-textarea');
+
+    // Create preview div for rendering Markdown (hidden initially)
     const previewDiv = document.createElement('div');
     previewDiv.classList.add('preview');
-    previewDiv.style.flexGrow = '1';
-    previewDiv.style.overflowY = 'auto';
-    previewDiv.style.padding = '5px';
-    previewDiv.style.backgroundColor = 'transparent';
 
-    // Set initial display based on the note's preview state
+    // Use a utility class 'hidden' to manage display based on note.preview state
     if (note.preview) {
-      textarea.style.display = 'none';
-      previewDiv.style.display = 'block';
+      textarea.classList.add('hidden');
+      previewDiv.classList.remove('hidden');
       previewDiv.innerHTML = marked.parse(note.content);
     } else {
-      textarea.style.display = 'block';
-      previewDiv.style.display = 'none';
+      textarea.classList.remove('hidden');
+      previewDiv.classList.add('hidden');
     }
 
+    // Update note content as user types
     textarea.addEventListener('input', (event) => {
       updateNoteContent(note.id, event.target.value);
     });
@@ -155,57 +166,42 @@ function renderNotes() {
     contentContainer.appendChild(textarea);
     contentContainer.appendChild(previewDiv);
 
-    // Container for buttons (Edit/Preview, Secret, and Pin)
+    // Create button container for note actions (toggle, secret, pin)
     const buttonContainer = document.createElement('div');
-    buttonContainer.style.display = 'flex';
-    buttonContainer.style.gap = '10px';
-    buttonContainer.style.marginTop = '5px';
+    buttonContainer.classList.add('button-container');
 
-    // Toggle button for switching between edit and preview modes
+    // Create toggle button for switching between edit and preview mode
     const toggleButton = document.createElement('button');
     toggleButton.classList.add('toggle-button');
-    toggleButton.style.fontWeight = 'bold';
-    // Set button text based on current preview state
     toggleButton.textContent = note.preview ? 'Edit' : 'Preview';
     toggleButton.addEventListener('click', () => {
       if (note.preview) {
-        // Switch from preview mode to edit mode
-        textarea.style.display = 'block';
-        previewDiv.style.display = 'none';
+        // Switch to edit mode
+        textarea.classList.remove('hidden');
+        previewDiv.classList.add('hidden');
         toggleButton.textContent = 'Preview';
         note.preview = false;
         textarea.focus();
       } else {
-        // Switch from edit mode to preview mode
+        // Switch to preview mode; update rendered Markdown
         previewDiv.innerHTML = marked.parse(textarea.value);
-        textarea.style.display = 'none';
-        previewDiv.style.display = 'block';
+        textarea.classList.add('hidden');
+        previewDiv.classList.remove('hidden');
         toggleButton.textContent = 'Edit';
         note.preview = true;
       }
-      // Persist the preview state
       saveNotes();
     });
     buttonContainer.appendChild(toggleButton);
 
-    // Secret button to toggle blur
+    // Create secret button for toggling the blur effect on the note content
     const secretButton = document.createElement('button');
     secretButton.classList.add('toggle-button');
-    secretButton.style.fontWeight = 'bold';
-
-    if (note.blurred) {
-      textarea.style.filter = 'blur(5px)';
-      previewDiv.style.filter = 'blur(5px)';
-      secretButton.textContent = 'Unblur';
-    } else {
-      textarea.style.filter = 'none';
-      previewDiv.style.filter = 'none';
-      secretButton.textContent = 'Secret';
-    }
+    secretButton.textContent = note.blurred ? 'Unblur' : 'Secret';
     secretButton.addEventListener('click', () => {
       note.blurred = !note.blurred;
       saveNotes();
-      // Update the UI directly without re-rendering the whole note
+      // Update the blur style directly without re-rendering
       if (note.blurred) {
         textarea.style.filter = 'blur(5px)';
         previewDiv.style.filter = 'blur(5px)';
@@ -218,22 +214,19 @@ function renderNotes() {
     });
     buttonContainer.appendChild(secretButton);
 
-    // Pin button to toggle pinned state (cannot be deleted if pinned)
+    // Create pin button for toggling pinned state
     const pinButton = document.createElement('button');
     pinButton.classList.add('toggle-button');
     const pinImg = document.createElement('img');
+    // Use different images depending on whether the note is pinned
     pinImg.src = note.pinned ? 'assets/pin.png' : 'assets/pinned.png';
     pinImg.alt = note.pinned ? 'Unpin Note' : 'Pin Note';
     pinButton.title = note.pinned ? 'Unpin Note' : 'Pin Note';
-    if (note.pinned) {
-      noteDiv.style.border = '2px solid red';
-    } else {
-      noteDiv.style.border = 'none';
-    }
     pinButton.appendChild(pinImg);
     pinButton.addEventListener('click', () => {
       note.pinned = !note.pinned;
       saveNotes();
+      // Re-render notes to update the pinned class and red border
       renderNotes();
     });
     buttonContainer.appendChild(pinButton);
@@ -244,7 +237,9 @@ function renderNotes() {
   });
 }
 
-// Create a new note with preview defaulting to edit mode (preview: false)
+/**
+ * Creates a new note with default properties.
+ */
 function createNote() {
   console.log('Creating a new note...');
   const timestamp = Date.now();
@@ -262,7 +257,9 @@ function createNote() {
   renderNotes();
 }
 
-// Update a note's title and auto-save
+/**
+ * Updates a note's title given an id and new title.
+ */
 function updateNoteTitle(id, title) {
   const note = notes.find((n) => n.id === id);
   if (note) {
@@ -271,7 +268,9 @@ function updateNoteTitle(id, title) {
   }
 }
 
-// Update a note's content and auto-save
+/**
+ * Updates a note's content given its id.
+ */
 function updateNoteContent(id, content) {
   const note = notes.find((n) => n.id === id);
   if (note) {
@@ -280,35 +279,40 @@ function updateNoteContent(id, content) {
   }
 }
 
-// Delete a note and re-render
+/**
+ * Deletes a note by id and re-renders all notes.
+ */
 function deleteNote(id) {
   notes = notes.filter((n) => n.id !== id);
   saveNotes();
   renderNotes();
 }
 
-// Handle search input
+/**
+ * Handles updating the search query and re-renders notes.
+ */
 function handleSearch(event) {
   searchQuery = event.target.value;
   renderNotes();
 }
 
-// Handle changes to the global reminder input
+/**
+ * Handles changes to the global reminder input.
+ */
 function handleGlobalReminder(event) {
   const datetimeString = event.target.value;
   if (datetimeString) {
     globalReminder = new Date(datetimeString).getTime();
-    console.log(
-      'Global reminder set for',
-      new Date(globalReminder).toLocaleString()
-    );
+    console.log('Global reminder set for', new Date(globalReminder).toLocaleString());
   } else {
     globalReminder = null;
   }
   saveNotes();
 }
 
-// Periodically check for the global reminder
+/**
+ * Periodically checks if the global reminder has been reached.
+ */
 function checkGlobalReminder() {
   if (globalReminder) {
     const now = Date.now();
@@ -325,42 +329,37 @@ function checkGlobalReminder() {
   }
 }
 
-// Set up event listeners when DOM is loaded
+// Set up event listeners when the DOM is fully loaded.
 document.addEventListener('DOMContentLoaded', () => {
   console.log('DOM fully loaded. Setting up event listeners.');
 
+  // New Note button
   const newNoteButton = document.getElementById('new-note');
   if (newNoteButton) {
-    newNoteButton.addEventListener('click', () => {
-      console.log('"New Note" button clicked.');
-      createNote();
-    });
+    newNoteButton.addEventListener('click', createNote);
   } else {
     console.error('New Note button not found.');
   }
 
+  // Menu button and side menu for extra options
   const menuButton = document.getElementById('menu-button');
   const sideMenu = document.getElementById('side-menu');
-
   menuButton.addEventListener('click', (e) => {
     e.stopPropagation();
-    if (sideMenu.style.right === '0px') {
-      sideMenu.style.right = '-30%';
+    // Toggle the open state using the 'open' class
+    if (sideMenu.classList.contains('open')) {
+      sideMenu.classList.remove('open');
     } else {
-      sideMenu.style.right = '0px';
+      sideMenu.classList.add('open');
     }
   });
 
-  sideMenu.addEventListener('click', (e) => {
-    e.stopPropagation();
-  });
-
+  sideMenu.addEventListener('click', (e) => { e.stopPropagation(); });
   document.addEventListener('click', () => {
-    if (sideMenu.style.right === '0px') {
-      sideMenu.style.right = '-30%';
-    }
+    sideMenu.classList.remove('open');
   });
 
+  // Export button within the side menu
   const exportButton = document.getElementById('export-notes');
   if (exportButton) {
     exportButton.addEventListener('click', exportNotesAsJSON);
@@ -369,6 +368,7 @@ document.addEventListener('DOMContentLoaded', () => {
     console.error('Export button not found.');
   }
 
+  // Search input field
   const searchInput = document.getElementById('search-input');
   if (searchInput) {
     searchInput.addEventListener('input', handleSearch);
@@ -376,6 +376,7 @@ document.addEventListener('DOMContentLoaded', () => {
     console.error('Search input not found.');
   }
 
+  // Global reminder input field
   const globalReminderInput = document.getElementById('global-reminder');
   if (globalReminderInput) {
     globalReminderInput.addEventListener('change', handleGlobalReminder);
@@ -387,13 +388,16 @@ document.addEventListener('DOMContentLoaded', () => {
     console.error('Global reminder input not found.');
   }
 
+  // Load saved notes and render them
   loadNotes();
   renderNotes();
-
-  setInterval(checkGlobalReminder, 10000); // every 10s; adjust as needed
+  // Set up periodic check for global reminder
+  setInterval(checkGlobalReminder, 10000); // every 10 seconds
 });
 
-// Export notes as a JSON file
+/**
+ * Exports notes as a JSON file.
+ */
 function exportNotesAsJSON() {
   const jsonContent = JSON.stringify(notes, null, 2);
   const blob = new Blob([jsonContent], { type: "application/json" });
