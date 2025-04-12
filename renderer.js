@@ -410,10 +410,31 @@ document.addEventListener('DOMContentLoaded', () => {
         reader.onload = (event) => {
           try {
             const importedNotes = JSON.parse(event.target.result);
-            // Merge imported notes with the existing ones:
-            // Option 1: Simply append them:
-            notes = notes.concat(importedNotes);
-
+        
+            // Check that importedNotes is an array
+            if (!Array.isArray(importedNotes)) {
+              alert('Error: Imported data is not an array of notes.');
+              return;
+            }
+        
+            // Filter the array to only include notes that have the required structure.
+            // Here we check for the existence of key properties: id, title, content, and created.
+            const validNotes = importedNotes.filter(note =>
+              note &&
+              typeof note === 'object' &&
+              note.hasOwnProperty('id') &&
+              typeof note.title === 'string' &&
+              typeof note.content === 'string' &&
+              note.hasOwnProperty('created')
+            );
+        
+            if (validNotes.length === 0) {
+              alert('Error: No valid notes found in the imported file.');
+              return;
+            }
+        
+            // Merge the valid imported notes with the existing ones
+            notes = notes.concat(validNotes);
             saveNotes();
             renderNotes();
             alert('Notes imported and merged successfully.');
@@ -421,6 +442,7 @@ document.addEventListener('DOMContentLoaded', () => {
             alert('Error importing file: ' + err.message);
           }
         };
+        
         reader.readAsText(file);
         // Clear input value so the same file can be re-imported if needed
         fileInput.value = '';
