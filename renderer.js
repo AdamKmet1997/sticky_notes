@@ -388,9 +388,69 @@ document.addEventListener('DOMContentLoaded', () => {
   if (exportButton) {
     exportButton.addEventListener('click', exportNotesAsJSON);
     console.log('Export button found.');
-  } else {
-    console.error('Export button not found.');
-  }
+    } else {
+      console.error('Export button not found.');
+    }
+
+    // Setup Import functionality:
+    const importButton = document.getElementById('import-notes');
+    const fileInput = document.getElementById('file-input');
+    if (importButton && fileInput) {
+      // When import button is clicked, simulate a click on the hidden file input.
+      importButton.addEventListener('click', (e) => {
+        e.stopPropagation();
+        fileInput.click();
+      });
+
+      // When a file is selected, read its contents and parse as JSON.
+      fileInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          try {
+            const importedNotes = JSON.parse(event.target.result);
+        
+            // Check that importedNotes is an array
+            if (!Array.isArray(importedNotes)) {
+              alert('Error: Imported data is not an array of notes.');
+              return;
+            }
+        
+            // Filter the array to only include notes that have the required structure.
+            // Here we check for the existence of key properties: id, title, content, and created.
+            const validNotes = importedNotes.filter(note =>
+              note &&
+              typeof note === 'object' &&
+              note.hasOwnProperty('id') &&
+              typeof note.title === 'string' &&
+              typeof note.content === 'string' &&
+              note.hasOwnProperty('created')
+            );
+        
+            if (validNotes.length === 0) {
+              alert('Error: No valid notes found in the imported file.');
+              return;
+            }
+        
+            // Merge the valid imported notes with the existing ones
+            notes = notes.concat(validNotes);
+            saveNotes();
+            renderNotes();
+            alert('Notes imported and merged successfully.');
+          } catch (err) {
+            alert('Error importing file: ' + err.message);
+          }
+        };
+        
+        reader.readAsText(file);
+        // Clear input value so the same file can be re-imported if needed
+        fileInput.value = '';
+      });
+    } else {
+      console.error('Import functionality elements not found.');
+    }
+
 
   // Search input field
   const searchInput = document.getElementById('search-input');
