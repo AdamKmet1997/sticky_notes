@@ -111,9 +111,9 @@ function renderNotes() {
     deleteButton.addEventListener('click', () => {
       // Prevent deleting a pinned note
       if (note.pinned) {
-        window.alert("This note is pinned and cannot be deleted.");
+        window.alert('This note is pinned and cannot be deleted.');
       } else {
-        if (window.confirm("Are you sure you want to delete this note?")) {
+        if (window.confirm('Are you sure you want to delete this note?')) {
           deleteNote(note.id);
         }
       }
@@ -132,7 +132,8 @@ function renderNotes() {
     // Display creation date of the note
     const createdDiv = document.createElement('div');
     createdDiv.classList.add('created');
-    createdDiv.textContent = 'Created: ' + new Date(note.created).toLocaleString();
+    createdDiv.textContent =
+      'Created: ' + new Date(note.created).toLocaleString();
     noteDiv.appendChild(createdDiv);
 
     // Create content container (holds editing area and preview)
@@ -166,7 +167,6 @@ function renderNotes() {
       textarea.style.filter = 'none';
       previewDiv.style.filter = 'none';
     }
-
 
     // Update note content as user types
     textarea.addEventListener('input', (event) => {
@@ -274,7 +274,7 @@ function createNote() {
     created: timestamp,
     pinned: false,
     blurred: false,
-    preview: false
+    preview: false,
   };
   notes.push(newNote);
   saveNotes();
@@ -327,7 +327,10 @@ function handleGlobalReminder(event) {
   const datetimeString = event.target.value;
   if (datetimeString) {
     globalReminder = new Date(datetimeString).getTime();
-    console.log('Global reminder set for', new Date(globalReminder).toLocaleString());
+    console.log(
+      'Global reminder set for',
+      new Date(globalReminder).toLocaleString()
+    );
   } else {
     globalReminder = null;
   }
@@ -378,7 +381,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  sideMenu.addEventListener('click', (e) => { e.stopPropagation(); });
+  sideMenu.addEventListener('click', (e) => {
+    e.stopPropagation();
+  });
   document.addEventListener('click', () => {
     sideMenu.classList.remove('open');
   });
@@ -388,69 +393,69 @@ document.addEventListener('DOMContentLoaded', () => {
   if (exportButton) {
     exportButton.addEventListener('click', exportNotesAsJSON);
     console.log('Export button found.');
-    } else {
-      console.error('Export button not found.');
-    }
+  } else {
+    console.error('Export button not found.');
+  }
 
-    // Setup Import functionality:
-    const importButton = document.getElementById('import-notes');
-    const fileInput = document.getElementById('file-input');
-    if (importButton && fileInput) {
-      // When import button is clicked, simulate a click on the hidden file input.
-      importButton.addEventListener('click', (e) => {
-        e.stopPropagation();
-        fileInput.click();
-      });
+  // Setup Import functionality:
+  const importButton = document.getElementById('import-notes');
+  const fileInput = document.getElementById('file-input');
+  if (importButton && fileInput) {
+    // When import button is clicked, simulate a click on the hidden file input.
+    importButton.addEventListener('click', (e) => {
+      e.stopPropagation();
+      fileInput.click();
+    });
 
-      // When a file is selected, read its contents and parse as JSON.
-      fileInput.addEventListener('change', (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = (event) => {
-          try {
-            const importedNotes = JSON.parse(event.target.result);
-        
-            // Check that importedNotes is an array
-            if (!Array.isArray(importedNotes)) {
-              alert('Error: Imported data is not an array of notes.');
-              return;
-            }
-        
-            // Filter the array to only include notes that have the required structure.
-            // Here we check for the existence of key properties: id, title, content, and created.
-            const validNotes = importedNotes.filter(note =>
+    // When a file is selected, read its contents and parse as JSON.
+    fileInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        try {
+          const importedNotes = JSON.parse(event.target.result);
+
+          // Check that importedNotes is an array
+          if (!Array.isArray(importedNotes)) {
+            alert('Error: Imported data is not an array of notes.');
+            return;
+          }
+
+          // Filter the array to only include notes that have the required structure.
+          // Here we check for the existence of key properties: id, title, content, and created.
+          const validNotes = importedNotes.filter(
+            (note) =>
               note &&
               typeof note === 'object' &&
-              note.hasOwnProperty('id') &&
+              Object.prototype.hasOwnProperty.call(note, 'id') &&
               typeof note.title === 'string' &&
               typeof note.content === 'string' &&
-              note.hasOwnProperty('created')
-            );
-        
-            if (validNotes.length === 0) {
-              alert('Error: No valid notes found in the imported file.');
-              return;
-            }
-        
-            // Merge the valid imported notes with the existing ones
-            notes = notes.concat(validNotes);
-            saveNotes();
-            renderNotes();
-            alert('Notes imported and merged successfully.');
-          } catch (err) {
-            alert('Error importing file: ' + err.message);
-          }
-        };
-        
-        reader.readAsText(file);
-        // Clear input value so the same file can be re-imported if needed
-        fileInput.value = '';
-      });
-    } else {
-      console.error('Import functionality elements not found.');
-    }
+              Object.prototype.hasOwnProperty.call(note, 'created')
+          );
 
+          if (validNotes.length === 0) {
+            alert('Error: No valid notes found in the imported file.');
+            return;
+          }
+
+          // Merge the valid imported notes with the existing ones
+          notes = notes.concat(validNotes);
+          saveNotes();
+          renderNotes();
+          alert('Notes imported and merged successfully.');
+        } catch (err) {
+          alert('Error importing file: ' + err.message);
+        }
+      };
+
+      reader.readAsText(file);
+      // Clear input value so the same file can be re-imported if needed
+      fileInput.value = '';
+    });
+  } else {
+    console.error('Import functionality elements not found.');
+  }
 
   // Search input field
   const searchInput = document.getElementById('search-input');
@@ -484,11 +489,11 @@ document.addEventListener('DOMContentLoaded', () => {
  */
 function exportNotesAsJSON() {
   const jsonContent = JSON.stringify(notes, null, 2);
-  const blob = new Blob([jsonContent], { type: "application/json" });
+  const blob = new Blob([jsonContent], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.setAttribute("href", url);
-  link.setAttribute("download", "notes_export.json");
+  const link = document.createElement('a');
+  link.setAttribute('href', url);
+  link.setAttribute('download', 'notes_export.json');
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
