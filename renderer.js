@@ -158,6 +158,16 @@ function renderNotes() {
       previewDiv.classList.add('hidden');
     }
 
+    // *** Set blur styles based on note.blurred property ***
+    if (note.blurred) {
+      textarea.style.filter = 'blur(5px)';
+      previewDiv.style.filter = 'blur(5px)';
+    } else {
+      textarea.style.filter = 'none';
+      previewDiv.style.filter = 'none';
+    }
+
+
     // Update note content as user types
     textarea.addEventListener('input', (event) => {
       updateNoteContent(note.id, event.target.value);
