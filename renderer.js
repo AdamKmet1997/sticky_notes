@@ -388,9 +388,47 @@ document.addEventListener('DOMContentLoaded', () => {
   if (exportButton) {
     exportButton.addEventListener('click', exportNotesAsJSON);
     console.log('Export button found.');
-  } else {
-    console.error('Export button not found.');
-  }
+    } else {
+      console.error('Export button not found.');
+    }
+
+    // Setup Import functionality:
+    const importButton = document.getElementById('import-notes');
+    const fileInput = document.getElementById('file-input');
+    if (importButton && fileInput) {
+      // When import button is clicked, simulate a click on the hidden file input.
+      importButton.addEventListener('click', (e) => {
+        e.stopPropagation();
+        fileInput.click();
+      });
+
+      // When a file is selected, read its contents and parse as JSON.
+      fileInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          try {
+            const importedNotes = JSON.parse(event.target.result);
+            // Merge imported notes with the existing ones:
+            // Option 1: Simply append them:
+            notes = notes.concat(importedNotes);
+
+            saveNotes();
+            renderNotes();
+            alert('Notes imported and merged successfully.');
+          } catch (err) {
+            alert('Error importing file: ' + err.message);
+          }
+        };
+        reader.readAsText(file);
+        // Clear input value so the same file can be re-imported if needed
+        fileInput.value = '';
+      });
+    } else {
+      console.error('Import functionality elements not found.');
+    }
+
 
   // Search input field
   const searchInput = document.getElementById('search-input');
