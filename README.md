@@ -10,6 +10,8 @@ Sticky Notes is a lightweight, cross-platform desktop application built with Ele
   Quickly create new notes with a single click and edit titles and content in real time.
 - **Markdown Support:**  
   Write your notes in Markdown and easily switch between an edit (read/write) mode and a preview (read-only) mode.
+- **Your data is only yours**
+  All your notes stay on your device.
 - **Search and Filter:**  
   Instantly search for notes by keywords in the title or content.
 - **Auto-Save:**  
