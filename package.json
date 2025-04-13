@@ -30,6 +30,7 @@
   },
   "build": {
     "appId": "com.adamkmet.stickynotes",
+    "productName": "Sticky Notes",
     "mac": {
       "category": "public.app-category.productivity",
       "target": "dmg",
