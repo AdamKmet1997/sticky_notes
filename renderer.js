@@ -67,10 +67,13 @@ function renderNotes() {
   // Filter notes based on the search query
   const filteredNotes = notes.filter((note) => {
     const query = searchQuery.toLowerCase();
-    return (
-      note.title.toLowerCase().includes(query) ||
-      note.content.toLowerCase().includes(query)
-    );
+    
+    // Search in title, content, and tags
+    const titleMatch = note.title.toLowerCase().includes(query);
+    const contentMatch = note.content.toLowerCase().includes(query);
+    const tagMatch = note.tags && note.tags.some(tag => tag.toLowerCase().includes(query));
+    
+    return titleMatch || contentMatch || tagMatch;
   });
 
   // Create DOM elements for each filtered note
@@ -128,6 +131,30 @@ function renderNotes() {
       updateNoteTitle(note.id, event.target.value);
     });
     noteDiv.appendChild(titleInput);
+
+    // Create tags input for the note's tags
+    const tagsInput = document.createElement('input');
+    tagsInput.classList.add('note-tags');
+    tagsInput.placeholder = 'Tags: work personal important...';
+    tagsInput.value = note.tags ? note.tags.join(' ') : '';
+    tagsInput.addEventListener('input', (event) => {
+      updateNoteTags(note.id, event.target.value);
+    });
+    noteDiv.appendChild(tagsInput);
+
+    // Create tags display div
+    const tagsDisplay = document.createElement('div');
+    tagsDisplay.classList.add('tags-display');
+    if (note.tags && note.tags.length > 0) {
+      note.tags.forEach(tag => {
+        const tagSpan = document.createElement('span');
+        tagSpan.classList.add('tag');
+        tagSpan.style.backgroundColor = getTagColor(tag);
+        tagSpan.textContent = tag;
+        tagsDisplay.appendChild(tagSpan);
+      });
+    }
+    noteDiv.appendChild(tagsDisplay);
 
     // Display creation date of the note
     const createdDiv = document.createElement('div');
@@ -275,6 +302,7 @@ function createNote() {
     pinned: false,
     blurred: false,
     preview: false,
+    tags: [],
   };
   notes.push(newNote);
   saveNotes();
@@ -300,6 +328,67 @@ function updateNoteContent(id, content) {
   if (note) {
     note.content = content;
     debouncedSaveNotes();
+  }
+}
+
+/**
+ * Updates a note's tags given its id and tag string.
+ */
+function updateNoteTags(id, tagsString) {
+  const note = notes.find((n) => n.id === id);
+  if (note) {
+    // Parse tags from space-separated string, trim whitespace
+    const tags = tagsString.split(/\s+/).map(tag => tag.trim()).filter(tag => tag.length > 0);
+    note.tags = tags;
+    debouncedSaveNotes();
+    
+    // Update tags display without full re-render
+    updateTagsDisplay(id, note.tags);
+  }
+}
+
+/**
+ * Generates a consistent color for a tag based on its name.
+ */
+function getTagColor(tagName) {
+  const colors = [
+    '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7',
+    '#DDA0DD', '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E9',
+    '#F8C471', '#82E0AA', '#F1948A', '#85C1E9', '#D7BDE2'
+  ];
+  
+  // Generate a hash from the tag name to ensure consistent colors
+  let hash = 0;
+  for (let i = 0; i < tagName.length; i++) {
+    const char = tagName.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash; // Convert to 32-bit integer
+  }
+  
+  // Use absolute value and modulo to get a valid index
+  const colorIndex = Math.abs(hash) % colors.length;
+  return colors[colorIndex];
+}
+
+/**
+ * Updates the tags display for a specific note without re-rendering everything.
+ */
+function updateTagsDisplay(noteId, tags) {
+  const noteElement = document.querySelector(`[data-id="${noteId}"]`);
+  if (noteElement) {
+    const tagsDisplay = noteElement.querySelector('.tags-display');
+    if (tagsDisplay) {
+      tagsDisplay.innerHTML = '';
+      if (tags && tags.length > 0) {
+        tags.forEach(tag => {
+          const tagSpan = document.createElement('span');
+          tagSpan.classList.add('tag');
+          tagSpan.style.backgroundColor = getTagColor(tag);
+          tagSpan.textContent = tag;
+          tagsDisplay.appendChild(tagSpan);
+        });
+      }
+    }
   }
 }
 
