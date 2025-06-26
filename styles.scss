@@ -45,9 +45,14 @@ body {
   }
 }
 
-#search-input {
+#search-container {
   flex: 1;
-  padding: 10px;
+  position: relative;
+}
+
+#search-input {
+  width: 100%;
+  padding: 10px 35px 10px 10px;
   font-size: $font-size-input;
   border: none;
   border-radius: 10px;
@@ -56,11 +61,45 @@ body {
   box-shadow: $box-shadow-light;
   outline: none;
   transition: all 0.3s ease;
+  box-sizing: border-box;
 
   &:hover,
   &:focus {
     background-color: $input-bg-hover;
     box-shadow: $box-shadow-medium;
+  }
+}
+
+#search-clear {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  font-size: 14px;
+  font-weight: bold;
+  color: #666;
+  cursor: pointer;
+  padding: 0;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  z-index: 10;
+
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.95);
+    color: #333;
+    border-color: rgba(0, 0, 0, 0.2);
+  }
+
+  &:active {
+    transform: translateY(-50%) scale(0.9);
+    background-color: rgba(255, 255, 255, 1);
   }
 }
 
@@ -149,6 +188,38 @@ body {
       font-size: 10px;
       font-weight: bold;
       display: inline-block;
+    }
+  }
+
+  .reminder-container {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-bottom: 5px;
+
+    .reminder-label {
+      font-size: 14px;
+      color: #666;
+    }
+
+    .note-reminder {
+      flex: 1;
+      font-size: 11px;
+      padding: 2px 4px;
+      border: 1px solid #ddd;
+      border-radius: 3px;
+      background-color: rgba(255, 255, 255, 0.7);
+
+      &:focus {
+        outline: none;
+        border-color: #007bff;
+        background-color: rgba(255, 255, 255, 0.9);
+      }
+
+      &:not(:placeholder-shown) {
+        background-color: #fff3cd;
+        border-color: #ffc107;
+      }
     }
   }
 

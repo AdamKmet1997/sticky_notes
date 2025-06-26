@@ -156,6 +156,35 @@ function renderNotes() {
     }
     noteDiv.appendChild(tagsDisplay);
 
+    // Create reminder input for the note
+    const reminderContainer = document.createElement('div');
+    reminderContainer.classList.add('reminder-container');
+    
+    const reminderInput = document.createElement('input');
+    reminderInput.classList.add('note-reminder');
+    reminderInput.type = 'datetime-local';
+    reminderInput.title = 'Set reminder for this note';
+    if (note.reminder) {
+      const dt = new Date(note.reminder);
+      reminderInput.value = dt.toISOString().slice(0, 16);
+    }
+    reminderInput.addEventListener('change', (event) => {
+      updateNoteReminder(note.id, event.target.value);
+    });
+    
+    const reminderLabel = document.createElement('span');
+    reminderLabel.classList.add('reminder-label');
+    reminderLabel.textContent = '⏰';
+    reminderLabel.title = 'Reminder';
+    
+    reminderContainer.appendChild(reminderLabel);
+    reminderContainer.appendChild(reminderInput);
+    
+    // Hide reminder container by default
+    reminderContainer.style.display = 'none';
+    
+    noteDiv.appendChild(reminderContainer);
+
     // Display creation date of the note
     const createdDiv = document.createElement('div');
     createdDiv.classList.add('created');
@@ -282,6 +311,35 @@ function renderNotes() {
     });
     buttonContainer.appendChild(pinButton);
 
+    // Create reminder button for quick access
+    const reminderButton = document.createElement('button');
+    reminderButton.classList.add('toggle-button');
+    const reminderImg = document.createElement('img');
+    //unfilled bell (reminder hidden)
+    reminderImg.src = 'assets/bell-outline.png';
+    reminderImg.alt = 'Toggle Reminder';
+    reminderButton.title = 'Toggle Reminder';
+    reminderButton.appendChild(reminderImg);
+    reminderButton.addEventListener('click', () => {
+      // Toggle the reminder container visibility
+      const reminderContainer = noteDiv.querySelector('.reminder-container');
+      if (reminderContainer) {
+        if (reminderContainer.style.display === 'none') {
+          // Show reminder container
+          reminderContainer.style.display = 'flex';
+          reminderImg.src = 'assets/bell.png';
+          const reminderInput = reminderContainer.querySelector('.note-reminder');
+          if (reminderInput) {
+            reminderInput.focus();
+          }
+        } else {
+          reminderContainer.style.display = 'none';
+          reminderImg.src = 'assets/bell-outline.png';
+        }
+      }
+    });
+    buttonContainer.appendChild(reminderButton);
+
     contentContainer.appendChild(buttonContainer);
     noteDiv.appendChild(contentContainer);
     container.appendChild(noteDiv);
@@ -303,6 +361,7 @@ function createNote() {
     blurred: false,
     preview: false,
     tags: [],
+    reminder: null,
   };
   notes.push(newNote);
   saveNotes();
@@ -344,6 +403,25 @@ function updateNoteTags(id, tagsString) {
     
     // Update tags display without full re-render
     updateTagsDisplay(id, note.tags);
+  }
+}
+
+/**
+ * Updates a note's reminder given its id and datetime string.
+ */
+function updateNoteReminder(id, datetimeString) {
+  const note = notes.find((n) => n.id === id);
+  if (note) {
+    if (datetimeString) {
+      note.reminder = new Date(datetimeString).getTime();
+      console.log(`Reminder set for note "${note.title}" at ${new Date(note.reminder).toLocaleString()}`);
+      console.log(`Current time: ${new Date().toLocaleString()}`);
+      console.log(`Time until reminder: ${(note.reminder - Date.now()) / 1000} seconds`);
+    } else {
+      note.reminder = null;
+      console.log(`Reminder cleared for note "${note.title}"`);
+    }
+    debouncedSaveNotes();
   }
 }
 
@@ -427,22 +505,55 @@ function handleGlobalReminder(event) {
 }
 
 /**
- * Periodically checks if the global reminder has been reached.
+ * Periodically checks if any reminders have been reached.
  */
-function checkGlobalReminder() {
-  if (globalReminder) {
-    const now = Date.now();
-    if (now >= globalReminder) {
-      console.log('Global reminder time reached');
-      globalReminder = null;
-      localStorage.removeItem('globalReminder');
+function checkReminders() {
+  const now = Date.now();
+  
+  // Check global reminder
+  if (globalReminder && now >= globalReminder) {
+    console.log('Global reminder time reached');
+    globalReminder = null;
+    localStorage.removeItem('globalReminder');
+    if (window.api && window.api.showWindow) {
+      window.api.showWindow();
+    } else {
+      console.warn('showWindow API not available');
+    }
+  }
+  
+  // Check per-note reminders
+  const activeReminders = notes.filter(note => note.reminder);
+  if (activeReminders.length > 0) {
+    console.log(`Checking ${activeReminders.length} active note reminders...`);
+  }
+  
+  notes.forEach(note => {
+    if (note.reminder && now >= note.reminder) {
+      console.log(`🔔 Note reminder triggered for: "${note.title}" at ${new Date(now).toLocaleString()}`);
+      
+      // Bring window to front first
       if (window.api && window.api.showWindow) {
+        console.log('Calling showWindow API...');
         window.api.showWindow();
       } else {
         console.warn('showWindow API not available');
       }
+      
+      // Set search to show the triggered note instead of popup
+      const searchInput = document.getElementById('search-input');
+      if (searchInput) {
+        searchQuery = note.title;
+        searchInput.value = note.title;
+        console.log(`Setting search to: "${note.title}"`);
+      }
+      
+      console.log(`Clearing reminder for note: "${note.title}"`);
+      note.reminder = null; // Clear the reminder after triggering
+      saveNotes();
+      renderNotes(); // Re-render to update UI and show filtered note
     }
-  }
+  });
 }
 
 // Set up event listeners when the DOM is fully loaded.
@@ -554,6 +665,22 @@ document.addEventListener('DOMContentLoaded', () => {
     console.error('Search input not found.');
   }
 
+  // Search clear button
+  const searchClearButton = document.getElementById('search-clear');
+  if (searchClearButton) {
+    searchClearButton.addEventListener('click', () => {
+      const searchInput = document.getElementById('search-input');
+      if (searchInput) {
+        searchInput.value = '';
+        searchQuery = '';
+        renderNotes(); // Re-render to show all notes
+        searchInput.focus(); // Keep focus on search input
+      }
+    });
+  } else {
+    console.error('Search clear button not found.');
+  }
+
   // Global reminder input field
   const globalReminderInput = document.getElementById('global-reminder');
   if (globalReminderInput) {
@@ -569,8 +696,8 @@ document.addEventListener('DOMContentLoaded', () => {
   // Load saved notes and render them
   loadNotes();
   renderNotes();
-  // Set up periodic check for global reminder
-  setInterval(checkGlobalReminder, 10000); // every 10 seconds
+  // Set up periodic check for all reminders
+  setInterval(checkReminders, 10000); // every 10 seconds
 });
 
 /**
