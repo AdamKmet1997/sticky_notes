@@ -33,9 +33,14 @@ body {
   box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2);
 }
 
-#search-input {
+#search-container {
   flex: 1;
-  padding: 10px;
+  position: relative;
+}
+
+#search-input {
+  width: 100%;
+  padding: 10px 35px 10px 10px;
   font-size: 14px;
   border: none;
   border-radius: 10px;
@@ -44,10 +49,42 @@ body {
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   outline: none;
   transition: all 0.3s ease;
+  box-sizing: border-box;
 }
 #search-input:hover, #search-input:focus {
   background-color: rgba(255, 255, 0, 0.4);
   box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2);
+}
+
+#search-clear {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  font-size: 14px;
+  font-weight: bold;
+  color: #666;
+  cursor: pointer;
+  padding: 0;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  z-index: 10;
+}
+#search-clear:hover {
+  background-color: rgba(255, 255, 255, 0.95);
+  color: #333;
+  border-color: rgba(0, 0, 0, 0.2);
+}
+#search-clear:active {
+  transform: translateY(-50%) scale(0.9);
+  background-color: rgb(255, 255, 255);
 }
 
 #notes-container {
@@ -95,10 +132,70 @@ body {
 .note .note-title:focus {
   outline: none;
 }
+.note .note-tags {
+  width: 100%;
+  font-size: 12px;
+  padding: 3px 5px;
+  border: none;
+  background-color: rgba(255, 255, 255, 0.3);
+  border-radius: 3px;
+  margin-bottom: 5px;
+  color: #666;
+}
+.note .note-tags:focus {
+  outline: none;
+  background-color: rgba(255, 255, 255, 0.5);
+}
+.note .note-tags::placeholder {
+  color: #999;
+  font-style: italic;
+}
+.note .tags-display {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+.note .tags-display .tag {
+  background-color: #4CAF50;
+  color: white;
+  padding: 2px 6px;
+  border-radius: 12px;
+  font-size: 10px;
+  font-weight: bold;
+  display: inline-block;
+}
+.note .reminder-container {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-bottom: 5px;
+}
+.note .reminder-container .reminder-label {
+  font-size: 14px;
+  color: #666;
+}
+.note .reminder-container .note-reminder {
+  flex: 1;
+  font-size: 11px;
+  padding: 2px 4px;
+  border: 1px solid #ddd;
+  border-radius: 3px;
+  background-color: rgba(255, 255, 255, 0.7);
+}
+.note .reminder-container .note-reminder:focus {
+  outline: none;
+  border-color: #007bff;
+  background-color: rgba(255, 255, 255, 0.9);
+}
+.note .reminder-container .note-reminder:not(:placeholder-shown) {
+  background-color: #fff3cd;
+  border-color: #ffc107;
+}
 .note .created {
   font-size: 10px;
   color: #777;
-  margin-bottom: 5px;
+  margin-bottom: 3px;
 }
 .note textarea {
   flex-grow: 1;

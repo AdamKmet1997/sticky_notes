@@ -12,21 +12,26 @@ Sticky Notes is a lightweight, cross-platform desktop application built with Ele
   Write your notes in Markdown and easily switch between an edit (read/write) mode and a preview (read-only) mode.
 - **Your data is only yours**
   All your notes stay on your device.
-- **Search and Filter:**  
-  Instantly search for notes by keywords in the title or content.
+- **Advanced Search and Filter:**  
+  Instantly search for notes by keywords in the title, content, or tags. Features search highlighting that shows exactly where your search terms appear in notes. Includes a quick-clear button to reset search with one click.
+- **Smart Tagging System:**  
+  Create space-separated tags for each note (e.g., "work personal urgent"). Each tag gets a unique color for easy visual identification. Search by tag names to quickly filter related notes.
 - **Auto-Save:**  
   Your changes are automatically saved to local storage, ensuring that your notes persist across sessions.
-- **Global Reminders:**  
-  Set a global reminder that brings your app to the forefront at a specified time.
+- **Dual Reminder System:**  
+  Set both global app reminders and individual note reminders. When triggered, reminders automatically open the app and filter to show the relevant note instead of showing popups.
+- **Per-Note Reminders:**  
+  Each note can have its own reminder with a toggleable bell icon. Click the bell to show/hide reminder controls. Bell icon changes from outline to filled based on visibility state.
 - **System Tray Integration:**  
   Access your notes quickly via a system tray icon, keeping your workspace uncluttered.
-- **Export Notes as json:**
-  User is able to expand the side navigation bar and export their notes into a json format file.
-- **Import Notes:**
-  User is able to import any notes that they have exported previously.
-- **Pin comments:**
-  Pinned comments cannot be deleted, giving user extra security -**Resize Notes**
-  Resize the notes how you prefer them
+- **Export/Import Notes:**  
+  Export your notes as JSON files through the side navigation menu. Import previously exported notes to restore or merge with existing notes.
+- **Pin Notes:**  
+  Pin important notes to prevent accidental deletion, giving you extra security for critical information.
+- **Resizable Notes:**  
+  Resize notes to your preferred dimensions. Each note remembers its size for a personalized layout.
+- **Search Highlighting:**  
+  When searching, matching terms are highlighted in yellow across note titles, content (in preview mode), and tags for instant visual feedback.
 
 ---
 
