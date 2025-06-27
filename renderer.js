@@ -95,6 +95,15 @@ function renderNotes() {
       noteDiv.style.width = `${note.width}px`;
       noteDiv.style.height = `${note.height}px`;
     }
+    
+    // Apply saved position if available
+    if (note.x !== undefined && note.y !== undefined) {
+      noteDiv.style.left = `${note.x}px`;
+      noteDiv.style.top = `${note.y}px`;
+    }
+    
+    // Make note draggable
+    makeDraggable(noteDiv, note);
 
     // Save dimensions on resize: update note dimensions when mouse leaves the note
     noteDiv.addEventListener('mouseleave', () => {
@@ -362,10 +371,79 @@ function createNote() {
     preview: false,
     tags: [],
     reminder: null,
+    x: Math.random() * 200,
+    y: Math.random() * 200,
   };
   notes.push(newNote);
   saveNotes();
   renderNotes();
+}
+
+/**
+ * Makes a note element draggable.
+ */
+function makeDraggable(noteElement, note) {
+  let isDragging = false;
+  let startX, startY, initialX, initialY;
+  
+  // Add mousedown event to the note element
+  noteElement.addEventListener('mousedown', (e) => {
+    // Don't start dragging if clicking on input elements or buttons
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || 
+        e.target.tagName === 'BUTTON' || e.target.closest('button')) {
+      return;
+    }
+    
+    // Don't start dragging if clicking on resize handle area (bottom-right corner)
+    const rect = noteElement.getBoundingClientRect();
+    const resizeHandleSize = 20; // Size of the resize handle area
+    const isInResizeHandle = (
+      e.clientX > rect.right - resizeHandleSize &&
+      e.clientY > rect.bottom - resizeHandleSize
+    );
+    
+    if (isInResizeHandle) {
+      return;
+    }
+    
+    isDragging = true;
+    noteElement.classList.add('dragging');
+    
+    startX = e.clientX;
+    startY = e.clientY;
+    initialX = noteElement.offsetLeft;
+    initialY = noteElement.offsetTop;
+    
+    // Prevent text selection while dragging
+    e.preventDefault();
+  });
+  
+  // Add mousemove event to document
+  document.addEventListener('mousemove', (e) => {
+    if (!isDragging) return;
+    
+    const deltaX = e.clientX - startX;
+    const deltaY = e.clientY - startY;
+    
+    const newX = Math.max(0, initialX + deltaX);
+    const newY = Math.max(0, initialY + deltaY);
+    
+    noteElement.style.left = `${newX}px`;
+    noteElement.style.top = `${newY}px`;
+  });
+  
+  // Add mouseup event to document
+  document.addEventListener('mouseup', () => {
+    if (!isDragging) return;
+    
+    isDragging = false;
+    noteElement.classList.remove('dragging');
+    
+    // Save the new position
+    note.x = noteElement.offsetLeft;
+    note.y = noteElement.offsetTop;
+    saveNotes();
+  });
 }
 
 /**
