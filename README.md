@@ -30,6 +30,8 @@ Sticky Notes is a lightweight, cross-platform desktop application built with Ele
   Pin important notes to prevent accidental deletion, giving you extra security for critical information.
 - **Resizable Notes:**  
   Resize notes to your preferred dimensions. Each note remembers its size for a personalized layout.
+- **Draggable Notes:**  
+  Move notes around by dragging them to organize your workspace layout. Each note remembers its position for a customized arrangement.
 - **Search Highlighting:**  
   When searching, matching terms are highlighted in yellow across note titles, content (in preview mode), and tags for instant visual feedback.
 
