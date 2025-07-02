@@ -1,6 +1,6 @@
 {
   "name": "sticky-notes",
-  "version": "1.0.0",
+  "version": "1.4.0",
   "description": "Sticky Notes is a cross-platform desktop application built with Electron. It provides a fast and intuitive way to create, edit, and manage notes with Markdown support, auto-save, and global reminders—all accessible via a sleek system tray interface.",
   "main": "main.js",
   "scripts": {
