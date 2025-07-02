@@ -95,7 +95,7 @@ body {
 
 /* Note card styling */
 .note {
-  min-width: 220px;
+  min-width: 330px;
   min-height: 280px;
   box-sizing: border-box;
   background-color: #fffab3;
@@ -133,11 +133,17 @@ body {
 .note .delete-button {
   position: absolute;
   right: 8px;
+  top: 8px;
   cursor: pointer;
-}
-.note .delete-button img {
+  color: black;
+  font-size: 16px;
+  font-weight: bold;
   width: 16px;
   height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
 }
 .note .note-title {
   width: 100%;
@@ -233,11 +239,6 @@ body {
   border: none;
 }
 
-/* Pinned notes get a red border */
-.note.pinned-note {
-  border: 2px solid red;
-}
-
 /* Utility class to hide elements */
 .hidden {
   display: none !important;
@@ -272,8 +273,8 @@ body {
 /* Fixed button styles */
 #new-note {
   position: fixed;
-  bottom: 20px;
-  right: 80px;
+  bottom: 80px;
+  right: 20px;
   width: 50px;
   height: 50px;
   background-color: rgba(255, 255, 0, 0.5);
@@ -288,13 +289,21 @@ body {
   position: fixed;
   bottom: 20px;
   right: 20px;
-  background-color: transparent;
+  width: 50px;
+  height: 50px;
+  background-color: rgba(255, 255, 255, 0.8);
   border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 #menu-button img {
-  width: 40px;
-  height: 40px;
+  width: 30px;
+  height: 30px;
 }
 
 /* Side menu styling */

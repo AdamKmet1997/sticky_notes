@@ -7,6 +7,9 @@ let notes = [];
 // Global reminder variable (stored in milliseconds, null if unset)
 let globalReminder = null;
 
+// Track the highest z-index for note stacking
+let highestZIndex = 1;
+
 // Variable for keeping track of the current search query
 let searchQuery = '';
 
@@ -30,6 +33,30 @@ function loadNotes() {
   if (savedNotes) {
     try {
       notes = JSON.parse(savedNotes);
+      // Migrate existing notes to add color and zIndex properties
+      let needsSave = false;
+      let currentZIndex = 1;
+      notes = notes.map(note => {
+        if (!note.color) {
+          note.color = generateRandomColor();
+          needsSave = true;
+        }
+        if (!note.zIndex) {
+          note.zIndex = currentZIndex++;
+          needsSave = true;
+        }
+        return note;
+      });
+      
+      // Update highestZIndex to be higher than any existing note
+      if (notes.length > 0) {
+        highestZIndex = Math.max(...notes.map(note => note.zIndex || 0));
+      }
+      
+      // Save the updated notes if any were migrated
+      if (needsSave) {
+        saveNotes();
+      }
     } catch (e) {
       console.error('Error parsing notes from localStorage:', e);
       notes = [];
@@ -102,6 +129,17 @@ function renderNotes() {
       noteDiv.style.top = `${note.y}px`;
     }
     
+    // Apply saved z-index if available
+    if (note.zIndex !== undefined) {
+      noteDiv.style.zIndex = note.zIndex;
+    }
+    
+    // Apply random color styling if color exists
+    if (note.color) {
+      noteDiv.style.backgroundColor = getFadedColor(note.color);
+      noteDiv.style.border = `2px solid ${getDarkerColor(note.color)}`;
+    }
+    
     // Make note draggable
     makeDraggable(noteDiv, note);
 
@@ -113,13 +151,11 @@ function renderNotes() {
       saveNotes();
     });
 
-    // Create delete button with an image icon
+    // Create delete button with text X
     const deleteButton = document.createElement('div');
     deleteButton.classList.add('delete-button');
-    const deleteImg = document.createElement('img');
-    deleteImg.src = 'assets/x.png';
-    deleteImg.alt = 'Delete';
-    deleteButton.appendChild(deleteImg);
+    deleteButton.textContent = 'X';
+    deleteButton.title = 'Delete';
     deleteButton.addEventListener('click', () => {
       // Prevent deleting a pinned note
       if (note.pinned) {
@@ -373,6 +409,8 @@ function createNote() {
     reminder: null,
     x: Math.random() * 200,
     y: Math.random() * 200,
+    color: generateRandomColor(),
+    zIndex: getNextZIndex(),
   };
   notes.push(newNote);
   saveNotes();
@@ -408,6 +446,12 @@ function makeDraggable(noteElement, note) {
     
     isDragging = true;
     noteElement.classList.add('dragging');
+    
+    // Bring this note to the front
+    const newZIndex = bringNoteToFront(note.id);
+    if (newZIndex) {
+      noteElement.style.zIndex = newZIndex;
+    }
     
     startX = e.clientX;
     startY = e.clientY;
@@ -524,6 +568,75 @@ function getTagColor(tagName) {
   // Use absolute value and modulo to get a valid index
   const colorIndex = Math.abs(hash) % colors.length;
   return colors[colorIndex];
+}
+
+/**
+ * Generates a random color for notes with good contrast and readability.
+ */
+function generateRandomColor() {
+  const colors = [
+    '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7',
+    '#DDA0DD', '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E9',
+    '#F8C471', '#82E0AA', '#F1948A', '#AED6F1', '#D7BDE2',
+    '#FAD7A0', '#A9DFBF', '#F5B7B1', '#A3E4D7', '#D2B4DE',
+    '#FADBD8', '#D5F4E6', '#FCF3CF', '#EBDEF0', '#EAF2F8'
+  ];
+  
+  const randomIndex = Math.floor(Math.random() * colors.length);
+  return colors[randomIndex];
+}
+
+/**
+ * Converts hex color to RGB values
+ */
+function hexToRgb(hex) {
+  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  return result ? {
+    r: parseInt(result[1], 16),
+    g: parseInt(result[2], 16),
+    b: parseInt(result[3], 16)
+  } : null;
+}
+
+/**
+ * Creates a faded version of a color for backgrounds
+ */
+function getFadedColor(hex, opacity = 1) {
+  const rgb = hexToRgb(hex);
+  if (!rgb) return hex;
+  return `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${opacity})`;
+}
+
+/**
+ * Creates a darker version of a color for borders
+ */
+function getDarkerColor(hex, factor = 0.7) {
+  const rgb = hexToRgb(hex);
+  if (!rgb) return hex;
+  const r = Math.floor(rgb.r * factor);
+  const g = Math.floor(rgb.g * factor);
+  const b = Math.floor(rgb.b * factor);
+  return `rgb(${r}, ${g}, ${b})`;
+}
+
+/**
+ * Gets the next available z-index for note stacking
+ */
+function getNextZIndex() {
+  return ++highestZIndex;
+}
+
+/**
+ * Brings a note to the front by giving it the highest z-index
+ */
+function bringNoteToFront(noteId) {
+  const note = notes.find(n => n.id === noteId);
+  if (note) {
+    note.zIndex = getNextZIndex();
+    saveNotes();
+    return note.zIndex;
+  }
+  return null;
 }
 
 /**
