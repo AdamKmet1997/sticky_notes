@@ -25,6 +25,17 @@ Your data stays on your device.
 
 ---
 
+## Install (Mac)
+
+1. Open [GitHub Releases](https://github.com/AdamKmet1997/sticky_notes/releases/latest).
+2. Download `Sticky.Notes-<version>-arm64.dmg` (Apple Silicon Mac).
+3. Open the DMG and drag **Sticky Notes** into **Applications**.
+4. Launch the app from Applications. It runs from the **menu bar** — click the tray icon to open your notes.
+
+> **Note:** macOS may warn that the app is from an unidentified developer because it is not code-signed. Right-click the app → **Open** → **Open** to allow it the first time.
+
+---
+
 ## Installation for Developers
 
 1. Clone the repository:
@@ -40,9 +51,18 @@ Your data stays on your device.
    ```bash
    grunt
    ```
-4. Build the app:
+4. Build the macOS installer:
    ```bash
    npm run build
    ```
+   Output: `dist/Sticky.Notes-<version>-arm64.dmg`
+
+### Publishing a release
+
+1. Merge to `main` and update `version` in `package.json` if needed.
+2. Create a GitHub release (for example tag `v2.0.0`).
+3. The **Release Build** workflow builds the DMG and attaches it automatically.
+
+To rebuild manually for an existing tag, run **Actions → Release Build → Run workflow** and enter the release tag (for example `v2`).
 
 [!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://buymeacoffee.com/adamkmet)
