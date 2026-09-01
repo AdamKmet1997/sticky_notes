@@ -42,12 +42,13 @@ let activeGroup = '';
 let highestZIndex = 1;
 let undoTimer = null;
 let undoNote = null;
-const unlockedIds = new Set();
 const resizeObservers = [];
 let dragState = null;
+let resizeState = null;
 let persistTimer = null;
 let focusedNoteId = null;
 const titleEditingIds = new Set();
+const editingContentIds = new Set();
 
 function debouncePersist() {
   clearTimeout(persistTimer);
@@ -127,64 +128,10 @@ function sanitizeHtml(html) {
 }
 
 function renderMarkdown(content) {
-  const raw = window.marked ? marked.parse(content || '') : escapeHtml(content || '');
+  const raw = window.marked
+    ? marked.parse(content || '', { gfm: true, breaks: true })
+    : escapeHtml(content || '');
   return sanitizeHtml(raw);
-}
-
-function bytesToB64(bytes) {
-  let binary = '';
-  const arr = new Uint8Array(bytes);
-  arr.forEach((b) => {
-    binary += String.fromCharCode(b);
-  });
-  return btoa(binary);
-}
-
-function b64ToBytes(b64) {
-  return Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
-}
-
-async function deriveKey(password, salt) {
-  const material = await crypto.subtle.importKey(
-    'raw',
-    new TextEncoder().encode(password),
-    'PBKDF2',
-    false,
-    ['deriveKey']
-  );
-  return crypto.subtle.deriveKey(
-    { name: 'PBKDF2', salt, iterations: 100000, hash: 'SHA-256' },
-    material,
-    { name: 'AES-GCM', length: 256 },
-    false,
-    ['encrypt', 'decrypt']
-  );
-}
-
-async function encryptContent(content, password) {
-  const salt = crypto.getRandomValues(new Uint8Array(16));
-  const iv = crypto.getRandomValues(new Uint8Array(12));
-  const key = await deriveKey(password, salt);
-  const cipher = await crypto.subtle.encrypt(
-    { name: 'AES-GCM', iv },
-    key,
-    new TextEncoder().encode(content || '')
-  );
-  return {
-    lockSalt: bytesToB64(salt),
-    lockIv: bytesToB64(iv),
-    ciphertext: bytesToB64(cipher),
-  };
-}
-
-async function decryptContent(note, password) {
-  const key = await deriveKey(password, b64ToBytes(note.lockSalt));
-  const bytes = await crypto.subtle.decrypt(
-    { name: 'AES-GCM', iv: b64ToBytes(note.lockIv) },
-    key,
-    b64ToBytes(note.ciphertext)
-  );
-  return new TextDecoder().decode(bytes);
 }
 
 function generateRandomColor() {
@@ -233,9 +180,6 @@ function normalizeNote(raw) {
     color: PAPER_COLORS.includes(raw.color) ? raw.color : raw.color || generateRandomColor(),
     zIndex: raw.zIndex || 1,
     locked: Boolean(raw.locked),
-    lockSalt: raw.lockSalt || null,
-    lockIv: raw.lockIv || null,
-    ciphertext: raw.ciphertext || null,
   };
 }
 
@@ -244,8 +188,7 @@ function noteMatchesQuery(note, query) {
   const q = query.toLowerCase();
   return (
     (note.title || '').toLowerCase().includes(q) ||
-    (!(note.locked && !unlockedIds.has(note.id)) &&
-      (note.content || '').toLowerCase().includes(q)) ||
+    (!note.locked && (note.content || '').toLowerCase().includes(q)) ||
     (note.tags || []).some((tag) => tag.toLowerCase().includes(q)) ||
     (note.group || '').toLowerCase().includes(q)
   );
@@ -523,6 +466,59 @@ function updateNote(id, patch) {
   debouncePersist();
 }
 
+function bringNoteToFront(note, noteEl) {
+  note.zIndex = getNextZIndex();
+  if (noteEl) {
+    noteEl.style.zIndex = note.zIndex;
+  }
+  debouncePersist();
+}
+
+function startListResize(event, note, noteEl) {
+  resizeState = {
+    note,
+    el: noteEl,
+    startX: event.clientX,
+    startY: event.clientY,
+    startW: noteEl.offsetWidth,
+    startH: noteEl.offsetHeight,
+  };
+  event.preventDefault();
+  event.stopPropagation();
+}
+
+function bindListResize() {
+  document.addEventListener('mousemove', (event) => {
+    if (!resizeState) return;
+    const width = Math.max(280, resizeState.startW + event.clientX - resizeState.startX);
+    const height = Math.max(180, resizeState.startH + event.clientY - resizeState.startY);
+    resizeState.el.style.width = `${width}px`;
+    resizeState.el.style.height = `${height}px`;
+    resizeState.note.width = Math.round(width);
+    resizeState.note.height = Math.round(height);
+  });
+  document.addEventListener('mouseup', () => {
+    if (!resizeState) return;
+    resizeState = null;
+    persist();
+  });
+}
+
+function handleNoteMouseDown(event, note, noteEl) {
+  focusedNoteId = note.id;
+  bringNoteToFront(note, noteEl);
+
+  if (settings.view === 'list') {
+    const rect = noteEl.getBoundingClientRect();
+    const onHandle =
+      event.clientX > rect.right - 20 && event.clientY > rect.bottom - 20;
+    if (onHandle) startListResize(event, note, noteEl);
+    return;
+  }
+
+  startDrag(event, note, noteEl);
+}
+
 function startDrag(event, note, noteEl) {
   if (settings.view === 'list') return;
   const target = event.target;
@@ -542,8 +538,6 @@ function startDrag(event, note, noteEl) {
     originX: noteEl.offsetLeft,
     originY: noteEl.offsetTop,
   };
-  note.zIndex = getNextZIndex();
-  noteEl.style.zIndex = note.zIndex;
   noteEl.classList.add('dragging');
   event.preventDefault();
 }
@@ -630,17 +624,17 @@ function buildNoteCard(note) {
   }${searchQuery.trim() && noteMatchesQuery(note, searchQuery.trim()) ? ' search-match' : ''}`;
   noteEl.dataset.id = String(note.id);
   noteEl.style.backgroundColor = note.color || generateRandomColor();
-  if (note.width) noteEl.style.width = `${note.width}px`;
-  if (note.height) noteEl.style.height = `${note.height}px`;
-  if (settings.view !== 'list') {
+  if (settings.view === 'list') {
+    noteEl.style.width = `${note.width || 720}px`;
+    noteEl.style.height = `${note.height || 380}px`;
+  } else {
+    if (note.width) noteEl.style.width = `${note.width}px`;
+    if (note.height) noteEl.style.height = `${note.height}px`;
     noteEl.style.left = `${note.x || 0}px`;
     noteEl.style.top = `${note.y || 0}px`;
   }
   noteEl.style.zIndex = note.zIndex || 1;
-  noteEl.addEventListener('mousedown', () => {
-    focusedNoteId = note.id;
-  });
-  noteEl.addEventListener('mousedown', (event) => startDrag(event, note, noteEl));
+  noteEl.addEventListener('mousedown', (event) => handleNoteMouseDown(event, note, noteEl));
   observeSize(note, noteEl);
 
   const details = document.createElement('div');
@@ -673,12 +667,12 @@ function buildNoteCard(note) {
     persist();
     render();
   });
-  addTool('Due', 'Reminder, tags, color, and group', () => {
+  addTool('More', 'Reminder, color, and group', () => {
     details.classList.toggle('hidden');
     noteEl.classList.add('show-tools');
   });
-  addTool(note.locked ? 'Unlock' : 'Lock', 'Lock note content', async () => {
-    await toggleLock(note);
+  addTool(note.locked ? 'Unlock' : 'Lock', 'Hide note content', () => {
+    toggleLock(note);
     render();
   });
   addTool('Del', 'Delete note', () => deleteNote(note.id));
@@ -794,7 +788,7 @@ function buildNoteCard(note) {
   created.className = 'meta-row';
   created.textContent = `Created ${new Date(note.created).toLocaleString()}`;
 
-  details.append(tagsInput, groupRow, reminderRow, colorPicker, created);
+  details.append(groupRow, reminderRow, colorPicker, created);
 
   const due = document.createElement('div');
   due.className = 'due-chip';
@@ -807,34 +801,11 @@ function buildNoteCard(note) {
   const content = document.createElement('div');
   content.className = 'content-container';
 
-  const locked = note.locked && !unlockedIds.has(note.id);
-  if (locked) {
+  if (note.locked) {
     const overlay = document.createElement('div');
     overlay.className = 'lock-overlay';
-    overlay.innerHTML = '<strong>Locked</strong><span>Enter password to reveal this note.</span>';
-    const password = document.createElement('input');
-    password.type = 'password';
-    password.placeholder = 'Password';
-    const unlockBtn = document.createElement('button');
-    unlockBtn.type = 'button';
-    unlockBtn.className = 'toolbar-btn';
-    unlockBtn.textContent = 'Unlock';
-    const tryUnlock = async () => {
-      try {
-        note.content = await decryptContent(note, password.value);
-        unlockedIds.add(note.id);
-        persist();
-        render();
-      } catch {
-        showToast('Could not unlock note.');
-        setTimeout(hideToast, 2400);
-      }
-    };
-    unlockBtn.addEventListener('click', tryUnlock);
-    password.addEventListener('keydown', (event) => {
-      if (event.key === 'Enter') tryUnlock();
-    });
-    overlay.append(password, unlockBtn);
+    overlay.innerHTML =
+      '<strong>Locked</strong><span>Click Unlock in the toolbar to view or edit.</span>';
     content.appendChild(overlay);
   } else {
     const textarea = document.createElement('textarea');
@@ -843,65 +814,62 @@ function buildNoteCard(note) {
     textarea.placeholder = 'Write Markdown…';
 
     const preview = document.createElement('div');
-    preview.className = 'preview preview-live';
+    preview.className = 'preview';
 
-    const updatePreview = () => {
+    const refreshPreview = () => {
       preview.innerHTML = highlightHtml(renderMarkdown(note.content), searchQuery.trim());
     };
+
+    const enterEditMode = () => {
+      editingContentIds.add(note.id);
+      textarea.classList.remove('hidden');
+      preview.classList.add('hidden');
+      textarea.focus();
+    };
+
+    const exitEditMode = () => {
+      editingContentIds.delete(note.id);
+      refreshPreview();
+      textarea.classList.add('hidden');
+      preview.classList.remove('hidden');
+    };
+
     textarea.addEventListener('input', (event) => {
       note.content = event.target.value;
-      updatePreview();
       debouncePersist();
     });
-    updatePreview();
+    textarea.addEventListener('blur', exitEditMode);
+
+    preview.addEventListener('click', enterEditMode);
+    refreshPreview();
+
+    if (editingContentIds.has(note.id)) {
+      textarea.classList.remove('hidden');
+      preview.classList.add('hidden');
+      queueMicrotask(() => textarea.focus());
+    } else {
+      textarea.classList.add('hidden');
+      preview.classList.remove('hidden');
+    }
 
     if (note.blurred) {
       textarea.style.filter = 'blur(6px)';
       preview.style.filter = 'blur(6px)';
     }
 
-    content.append(textarea, preview);
+    content.append(preview, textarea);
   }
 
-  noteEl.append(toolbar, titleWrap, due, tagsDisplay, details, content);
+  noteEl.append(toolbar, titleWrap, due, tagsDisplay, tagsInput, details, content);
   return noteEl;
 }
 
-async function toggleLock(note) {
-  if (note.locked && unlockedIds.has(note.id)) {
-    const password = window.prompt('Password to lock this note again:');
-    if (!password) return;
-    const payload = await encryptContent(note.content, password);
-    Object.assign(note, payload, { locked: true, content: '' });
-    unlockedIds.delete(note.id);
-    await persist();
-    return;
-  }
+function toggleLock(note) {
+  note.locked = !note.locked;
   if (note.locked) {
-    const password = window.prompt('Password to unlock:');
-    if (!password) return;
-    try {
-      note.content = await decryptContent(note, password);
-      unlockedIds.add(note.id);
-      await persist();
-    } catch {
-      showToast('Could not unlock note.');
-      setTimeout(hideToast, 2400);
-    }
-    return;
+    editingContentIds.delete(note.id);
   }
-  const password = window.prompt('Choose a password to lock this note:');
-  if (!password) return;
-  const confirmPassword = window.prompt('Confirm password:');
-  if (password !== confirmPassword) {
-    showToast('Passwords did not match.');
-    setTimeout(hideToast, 2400);
-    return;
-  }
-  const payload = await encryptContent(note.content, password);
-  Object.assign(note, payload, { locked: true, content: '' });
-  unlockedIds.delete(note.id);
-  await persist();
+  persist();
 }
 
 function deleteNote(id) {
@@ -971,6 +939,12 @@ function render() {
   renderReminderInbox();
 
   const visible = filteredNotes();
+  if (focusedNoteId) {
+    const focused = findNote(focusedNoteId);
+    if (focused && visible.some((note) => note.id === focused.id)) {
+      focused.zIndex = getNextZIndex();
+    }
+  }
   if (!visible.length) {
     renderEmpty(container, notes.length > 0);
     return;
@@ -1095,6 +1069,7 @@ function setKeepOpen(value) {
 
 document.addEventListener('DOMContentLoaded', async () => {
   bindDrag();
+  bindListResize();
   await loadAll();
   applyTheme();
   applyKeepOpenUi();

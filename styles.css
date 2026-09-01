@@ -195,7 +195,7 @@ select {
   border: 1px solid var(--stroke);
   border-radius: 10px;
   padding: 6px;
-  z-index: 40;
+  z-index: 4500;
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -256,9 +256,10 @@ select {
   background: var(--bg-elevated);
   border-left: 1px solid var(--stroke);
   padding: 16px;
-  z-index: 30;
+  z-index: 5000;
   overflow: auto;
   transition: right 0.2s ease;
+  box-shadow: -8px 0 24px rgba(0, 0, 0, 0.12);
 }
 
 .panel.open {
@@ -347,10 +348,20 @@ select {
 }
 
 #notes-container.list-view {
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  gap: 12px;
+  display: block;
+}
+
+#notes-container.list-view .note {
+  position: relative;
+  left: auto !important;
+  top: auto !important;
+  margin: 0 auto 12px;
+  max-width: calc(100% - 32px);
+  min-width: 280px;
+  min-height: 180px;
+  resize: none;
+  overflow: hidden;
+  cursor: default;
 }
 
 .empty-state {
@@ -438,18 +449,6 @@ select {
   background: linear-gradient(135deg, transparent 50%, rgba(0, 0, 0, 0.18) 50%);
 }
 
-#notes-container.list-view .note {
-  position: relative;
-  left: auto !important;
-  top: auto !important;
-  width: min(720px, 100%);
-  max-width: 720px;
-  min-height: 140px;
-  height: auto;
-  resize: vertical;
-  cursor: default;
-}
-
 .note-toolbar {
   display: none;
   position: absolute;
@@ -466,14 +465,23 @@ select {
 }
 
 .note-tool {
-  min-width: 26px;
+  min-width: 28px;
   height: 26px;
-  padding: 0 5px;
+  padding: 0 6px;
   display: grid;
   place-items: center;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
-  background: rgba(255, 255, 255, 0.72);
+  letter-spacing: 0.01em;
+  color: #1f1f1a;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(0, 0, 0, 0.18);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+}
+
+.note-tool:hover {
+  background: #fff;
+  border-color: rgba(0, 0, 0, 0.28);
 }
 
 .note-title {
@@ -555,11 +563,11 @@ select {
   display: flex;
   flex-direction: column;
   min-height: 0;
-  gap: 6px;
 }
 
 .note textarea,
 .preview {
+  flex: 1;
   width: 100%;
   border: 0;
   resize: none;
@@ -567,27 +575,31 @@ select {
   font-size: 14px;
   outline: none;
   overflow: auto;
-}
-
-.note textarea {
-  flex: 0 0 42%;
-  min-height: 72px;
-  border-bottom: 1px dashed rgba(0, 0, 0, 0.12);
-  padding-bottom: 4px;
-}
-
-.preview {
-  flex: 1;
   min-height: 0;
 }
 
-.preview-live {
-  font-size: 13px;
-  color: #3b3b34;
+.preview {
+  cursor: text;
 }
 
-.preview p {
+.preview p,
+.preview ul,
+.preview ol {
   margin: 0 0 8px;
+}
+
+.preview ul,
+.preview ol {
+  padding-left: 1.25rem;
+}
+
+.preview li {
+  margin-bottom: 4px;
+}
+
+.preview input[type=checkbox] {
+  margin-right: 6px;
+  pointer-events: none;
 }
 
 .color-picker {
@@ -617,14 +629,7 @@ select {
   justify-content: center;
   gap: 8px;
   text-align: center;
-}
-
-.lock-overlay input {
-  width: 80%;
-  height: 32px;
-  border-radius: 8px;
-  border: 1px solid rgba(0, 0, 0, 0.15);
-  padding: 0 8px;
+  color: #4d4d46;
 }
 
 .hidden {

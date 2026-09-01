@@ -13,7 +13,7 @@ Sticky Notes is a cross-platform desktop app built with Electron. Create freefor
 - **Groups and tags** — Organize notes with folders/groups and colored tag chips.
 - **Reminders** — Per-note reminders with daily/weekly repeat, a global app reminder, native OS notifications, and a reminder inbox.
 - **Templates** — Blank, to-do, and meeting note templates (dropdown or right-click **New note**).
-- **Pin and lock** — Pin notes to prevent deletion; optionally lock note content with a password.
+- **Pin and lock** — Pin notes to prevent deletion; lock notes to hide content until you unlock them.
 - **Screen-share blur** — Hide sensitive note text with a one-click blur.
 - **Themes** — Light, dark, or follow system appearance.
 - **Keyboard shortcuts** — `⌘/Ctrl+N` new note, `⌘/Ctrl+F` search, `⌘/Ctrl+P` pin focused note, `⌘/Ctrl+1/2` board/list, arrow keys to move between notes, `Esc` to clear search.
