@@ -3,6 +3,7 @@ import globals from 'globals';
 import js from '@eslint/js';
 
 export default defineConfig([
+  { ignores: ['vendor/**'] },
   { files: ['**/*.{js,mjs,cjs}'] },
   { files: ['**/*.js'], languageOptions: { sourceType: 'commonjs' } },
   {

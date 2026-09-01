@@ -395,6 +395,31 @@ select {
   outline-offset: 1px;
 }
 
+.note.focused-note {
+  box-shadow: 0 0 0 2px var(--accent);
+}
+
+.note.search-match {
+  border-color: color-mix(in srgb, var(--accent) 55%, var(--stroke));
+}
+
+.note-title-wrap {
+  width: 100%;
+}
+
+.note-title-preview {
+  width: 100%;
+  text-align: left;
+  cursor: text;
+  border: 0;
+  padding: 4px 28px 4px 0;
+}
+
+.note-title-preview:hover {
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: 6px;
+}
+
 .note.dragging {
   z-index: 1000;
   cursor: grabbing;
@@ -530,11 +555,11 @@ select {
   display: flex;
   flex-direction: column;
   min-height: 0;
+  gap: 6px;
 }
 
 .note textarea,
 .preview {
-  flex: 1;
   width: 100%;
   border: 0;
   resize: none;
@@ -544,8 +569,21 @@ select {
   overflow: auto;
 }
 
+.note textarea {
+  flex: 0 0 42%;
+  min-height: 72px;
+  border-bottom: 1px dashed rgba(0, 0, 0, 0.12);
+  padding-bottom: 4px;
+}
+
 .preview {
-  cursor: text;
+  flex: 1;
+  min-height: 0;
+}
+
+.preview-live {
+  font-size: 13px;
+  color: #3b3b34;
 }
 
 .preview p {
@@ -625,5 +663,3 @@ select {
     padding: 0 8px;
   }
 }
-
-/*# sourceMappingURL=styles.css.map */

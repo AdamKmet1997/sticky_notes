@@ -46,6 +46,8 @@ const unlockedIds = new Set();
 const resizeObservers = [];
 let dragState = null;
 let persistTimer = null;
+let focusedNoteId = null;
+const titleEditingIds = new Set();
 
 function debouncePersist() {
   clearTimeout(persistTimer);
@@ -237,17 +239,25 @@ function normalizeNote(raw) {
   };
 }
 
+function noteMatchesQuery(note, query) {
+  if (!query) return false;
+  const q = query.toLowerCase();
+  return (
+    (note.title || '').toLowerCase().includes(q) ||
+    (!(note.locked && !unlockedIds.has(note.id)) &&
+      (note.content || '').toLowerCase().includes(q)) ||
+    (note.tags || []).some((tag) => tag.toLowerCase().includes(q)) ||
+    (note.group || '').toLowerCase().includes(q)
+  );
+}
+
 function filteredNotes() {
   const query = searchQuery.trim().toLowerCase();
   return notes.filter((note) => {
     if (activeTag && !(note.tags || []).some((tag) => tag === activeTag)) return false;
     if (activeGroup && note.group !== activeGroup) return false;
     if (!query) return true;
-    const titleMatch = (note.title || '').toLowerCase().includes(query);
-    const contentMatch = !note.locked && (note.content || '').toLowerCase().includes(query);
-    const tagMatch = (note.tags || []).some((tag) => tag.toLowerCase().includes(query));
-    const groupMatch = (note.group || '').toLowerCase().includes(query);
-    return titleMatch || contentMatch || tagMatch || groupMatch;
+    return noteMatchesQuery(note, query);
   });
 }
 
@@ -582,9 +592,42 @@ function renderTags(note, host) {
   });
 }
 
+function focusNoteElement(noteId) {
+  focusedNoteId = noteId;
+  render();
+  const el = document.querySelector(`[data-id="${noteId}"]`);
+  if (el) {
+    el.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    el.classList.add('focused-note');
+  }
+}
+
+function focusAdjacentNote(direction) {
+  const visible = filteredNotes();
+  if (!visible.length) return;
+  let index = visible.findIndex((note) => note.id === focusedNoteId);
+  if (index === -1) index = 0;
+  else index = Math.max(0, Math.min(visible.length - 1, index + direction));
+  focusNoteElement(visible[index].id);
+}
+
+function togglePinFocused() {
+  const note = findNote(focusedNoteId);
+  if (!note) {
+    showToast('Select a note first.');
+    setTimeout(hideToast, 1800);
+    return;
+  }
+  note.pinned = !note.pinned;
+  persist();
+  render();
+}
+
 function buildNoteCard(note) {
   const noteEl = document.createElement('article');
-  noteEl.className = `note${note.pinned ? ' pinned-note' : ''}`;
+  noteEl.className = `note${note.pinned ? ' pinned-note' : ''}${
+    focusedNoteId === note.id ? ' focused-note' : ''
+  }${searchQuery.trim() && noteMatchesQuery(note, searchQuery.trim()) ? ' search-match' : ''}`;
   noteEl.dataset.id = String(note.id);
   noteEl.style.backgroundColor = note.color || generateRandomColor();
   if (note.width) noteEl.style.width = `${note.width}px`;
@@ -594,6 +637,9 @@ function buildNoteCard(note) {
     noteEl.style.top = `${note.y || 0}px`;
   }
   noteEl.style.zIndex = note.zIndex || 1;
+  noteEl.addEventListener('mousedown', () => {
+    focusedNoteId = note.id;
+  });
   noteEl.addEventListener('mousedown', (event) => startDrag(event, note, noteEl));
   observeSize(note, noteEl);
 
@@ -637,12 +683,37 @@ function buildNoteCard(note) {
   });
   addTool('Del', 'Delete note', () => deleteNote(note.id));
 
-  const titleInput = document.createElement('input');
-  titleInput.className = 'note-title';
-  titleInput.value = note.title;
-  titleInput.addEventListener('input', (event) => {
-    updateNote(note.id, { title: event.target.value });
-  });
+  const titleWrap = document.createElement('div');
+  titleWrap.className = 'note-title-wrap';
+  const showTitlePreview = searchQuery.trim() && !titleEditingIds.has(note.id);
+
+  if (showTitlePreview) {
+    const titlePreview = document.createElement('button');
+    titlePreview.type = 'button';
+    titlePreview.className = 'note-title note-title-preview';
+    titlePreview.innerHTML = highlightText(note.title, searchQuery.trim());
+    titlePreview.title = 'Click to edit title';
+    titlePreview.addEventListener('click', (event) => {
+      event.stopPropagation();
+      titleEditingIds.add(note.id);
+      render();
+    });
+    titleWrap.appendChild(titlePreview);
+  } else {
+    const titleInput = document.createElement('input');
+    titleInput.className = 'note-title';
+    titleInput.value = note.title;
+    titleInput.addEventListener('input', (event) => {
+      updateNote(note.id, { title: event.target.value });
+    });
+    titleInput.addEventListener('blur', () => {
+      titleEditingIds.delete(note.id);
+    });
+    titleWrap.appendChild(titleInput);
+    if (titleEditingIds.has(note.id)) {
+      queueMicrotask(() => titleInput.focus());
+    }
+  }
 
   const tagsDisplay = document.createElement('div');
   tagsDisplay.className = 'tags-display';
@@ -767,36 +838,32 @@ function buildNoteCard(note) {
     content.appendChild(overlay);
   } else {
     const textarea = document.createElement('textarea');
+    textarea.className = 'note-textarea';
     textarea.value = note.content;
-    textarea.classList.add('hidden');
-    textarea.addEventListener('input', (event) => {
-      note.content = event.target.value;
-      preview.innerHTML = highlightHtml(renderMarkdown(note.content), searchQuery);
-      debouncePersist();
-    });
-    textarea.addEventListener('blur', () => {
-      textarea.classList.add('hidden');
-      preview.classList.remove('hidden');
-    });
+    textarea.placeholder = 'Write Markdown…';
 
     const preview = document.createElement('div');
-    preview.className = 'preview';
-    preview.innerHTML = highlightHtml(renderMarkdown(note.content), searchQuery);
-    preview.addEventListener('click', () => {
-      preview.classList.add('hidden');
-      textarea.classList.remove('hidden');
-      textarea.focus();
+    preview.className = 'preview preview-live';
+
+    const updatePreview = () => {
+      preview.innerHTML = highlightHtml(renderMarkdown(note.content), searchQuery.trim());
+    };
+    textarea.addEventListener('input', (event) => {
+      note.content = event.target.value;
+      updatePreview();
+      debouncePersist();
     });
+    updatePreview();
 
     if (note.blurred) {
       textarea.style.filter = 'blur(6px)';
       preview.style.filter = 'blur(6px)';
     }
 
-    content.append(preview, textarea);
+    content.append(textarea, preview);
   }
 
-  noteEl.append(toolbar, titleInput, due, tagsDisplay, details, content);
+  noteEl.append(toolbar, titleWrap, due, tagsDisplay, details, content);
   return noteEl;
 }
 
@@ -1046,6 +1113,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   document.getElementById('new-note').addEventListener('click', () => createNote('blank'));
+  document.getElementById('new-note').addEventListener('contextmenu', (event) => {
+    event.preventDefault();
+    document.getElementById('template-menu').classList.remove('hidden');
+  });
   document.getElementById('template-toggle').addEventListener('click', (event) => {
     event.stopPropagation();
     document.getElementById('template-menu').classList.toggle('hidden');
@@ -1133,6 +1204,21 @@ document.addEventListener('DOMContentLoaded', async () => {
       setView('board');
     } else if (meta && event.key.toLowerCase() === '2' && !inField) {
       setView('list');
+    } else if (meta && event.key.toLowerCase() === 'p' && !inField) {
+      event.preventDefault();
+      togglePinFocused();
+    } else if (event.key === 'ArrowDown' && !inField) {
+      event.preventDefault();
+      focusAdjacentNote(1);
+    } else if (event.key === 'ArrowUp' && !inField) {
+      event.preventDefault();
+      focusAdjacentNote(-1);
+    } else if (event.key === 'ArrowRight' && !inField && settings.view !== 'list') {
+      event.preventDefault();
+      focusAdjacentNote(1);
+    } else if (event.key === 'ArrowLeft' && !inField && settings.view !== 'list') {
+      event.preventDefault();
+      focusAdjacentNote(-1);
     }
   });
 

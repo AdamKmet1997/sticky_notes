@@ -17,6 +17,7 @@ const path = require('path');
 let tray = null;
 let window = null;
 let keepOpen = false;
+let hideTimer = null;
 
 const STORE_VERSION = 2;
 
@@ -203,9 +204,17 @@ function createWindow() {
   });
 
   window.on('blur', () => {
-    if (!keepOpen && window && !window.webContents.isDevToolsOpened()) {
-      window.hide();
-    }
+    if (keepOpen || !window || window.webContents.isDevToolsOpened()) return;
+    clearTimeout(hideTimer);
+    hideTimer = setTimeout(() => {
+      if (window && !window.isDestroyed() && !window.isFocused() && !keepOpen) {
+        window.hide();
+      }
+    }, 180);
+  });
+
+  window.on('focus', () => {
+    clearTimeout(hideTimer);
   });
 }
 
