@@ -1,59 +1,110 @@
 <!doctype html>
-<html>
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; script-src 'self'"
+    />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Sticky Notes</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <div id="header">
-      <div id="search-container">
-        <input id="search-input" type="text" placeholder="Search notes or tags (work personal)..." />
-        <button id="search-clear" title="Clear search">×</button>
-      </div>
-      <div id="global-reminder-container">
-        <input id="global-reminder" type="datetime-local" />
+    <div id="titlebar">
+      <div id="titlebar-title">Sticky Notes</div>
+      <div id="titlebar-actions">
+        <button id="keep-open-button" class="titlebar-btn" type="button" title="Keep window open (Esc still works)">
+          Keep open
+        </button>
+        <button id="theme-button" class="titlebar-btn" type="button" title="Toggle theme">
+          Theme
+        </button>
       </div>
     </div>
 
-    <!-- Main Add Note button -->
-    <button id="new-note">
-      <img src="assets/add.png" alt="Add Note" title="Add new sticky note" />
-    </button>
-
-    <!-- Menu button to open the side panel -->
-    <button id="menu-button">
-      <img src="assets/menu.png" alt="Menu" title="Open the side menu" />
-    </button>
-
-    <div id="side-menu">
-      <button id="export-notes" title="Export your notes as a JSON file">
-        <img src="assets/export.png" alt="Export Notes" />
+    <header id="toolbar">
+      <div id="search-container">
+        <input
+          id="search-input"
+          type="search"
+          placeholder="Search notes, tags, or groups"
+          autocomplete="off"
+        />
+        <button id="search-clear" type="button" title="Clear search">×</button>
+      </div>
+      <button id="view-board" class="toolbar-btn" type="button" title="Board view">Board</button>
+      <button id="view-list" class="toolbar-btn" type="button" title="List view">List</button>
+      <button id="reminder-inbox-button" class="toolbar-btn" type="button" title="Reminders">
+        Reminders
+        <span id="reminder-count" class="badge hidden">0</span>
       </button>
-      <!-- Import button for notes -->
-      <button id="import-notes" title="Import notes from a JSON file">
-        <img src="assets/import.png" alt="Import Notes" />
-      </button>
+      <div id="new-note-wrap">
+        <button id="new-note" class="toolbar-btn primary" type="button" title="New note (⌘N)">
+          New note
+        </button>
+        <button id="template-toggle" class="toolbar-btn" type="button" title="Note templates">
+          ▾
+        </button>
+        <div id="template-menu" class="popover hidden" role="menu">
+          <button type="button" data-template="blank">Blank note</button>
+          <button type="button" data-template="todo">To-do list</button>
+          <button type="button" data-template="meeting">Meeting notes</button>
+        </div>
+      </div>
+      <button id="menu-button" class="toolbar-btn" type="button" title="Import, export, and more">More</button>
+    </header>
+
+    <div id="filter-bar">
+      <div id="group-filters" class="chip-row"></div>
+      <div id="tag-filters" class="chip-row"></div>
+    </div>
+
+    <aside id="reminder-panel" class="panel" aria-label="Reminders">
+      <div class="panel-header">
+        <h2>Reminders</h2>
+        <button id="reminder-panel-close" type="button" class="icon-btn" title="Close">×</button>
+      </div>
+      <label class="field-label" for="global-reminder">App reminder</label>
+      <div class="field-row">
+        <input id="global-reminder" type="datetime-local" />
+        <button id="global-reminder-clear" type="button" class="toolbar-btn">Clear</button>
+      </div>
+      <p class="hint">Opens the app and notifies you. Per-note reminders are listed below.</p>
+      <div id="reminder-list"></div>
+    </aside>
+
+    <aside id="side-menu" class="panel" aria-label="More actions">
+      <div class="panel-header">
+        <h2>Library</h2>
+        <button id="side-menu-close" type="button" class="icon-btn" title="Close">×</button>
+      </div>
+      <button id="export-notes" class="panel-action" type="button">Export JSON</button>
+      <button id="import-notes" class="panel-action" type="button">Import JSON</button>
       <a
         id="github-link"
+        class="panel-action"
         href="https://github.com/AdamKmet1997/sticky_notes"
         target="_blank"
-        title="View the GitHub Repository"
+        rel="noreferrer"
       >
-        <img src="assets/github.png" alt="GitHub Repository" />
+        GitHub
       </a>
-    </div>
+    </aside>
 
-    <!-- Hidden file input for importing notes -->
-    <input
-      type="file"
-      id="file-input"
-      accept="application/json"
-      style="display: none"
-    />
+    <input id="file-input" type="file" accept="application/json" hidden />
 
-    <div id="notes-container"></div>
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <main id="notes-container" class="board-view"></main>
+
+    <div id="toast" class="toast hidden" role="status"></div>
+
+    <script src="vendor/marked.min.js"></script>
     <script src="renderer.js"></script>
   </body>
 </html>

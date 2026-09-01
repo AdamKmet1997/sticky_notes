@@ -1,47 +1,31 @@
 # Sticky Notes
 
-Sticky Notes is an elegant, cross-platform desktop application built with Electron. It offers a fast and intuitive way to create, edit,
-  search, and manage your notes. Featuring Markdown support, auto-save, and global reminders, Sticky Notes helps you stay organized and
-  productive—all accessible from a sleek system tray interface.
-  
+Sticky Notes is a cross-platform desktop app built with Electron. Create freeform sticky notes on a draggable board, search and filter instantly, and get native reminders—all from the system tray.
+
 ![Sticky Notes App](assets/1.4.0-screenshot.png)
 
 ## Features
 
-- **Create and Manage Notes:**  
-  Quickly create new notes with a single click and edit titles and content in real time.
-- **Markdown Support:**  
-  Write your notes in Markdown and easily switch between an edit (read/write) mode and a preview (read-only) mode.
-- **Your data is only yours**
-  All your notes stay on your device.
-- **Advanced Search and Filter:**  
-  Instantly search for notes by keywords in the title, content, or tags. Features search highlighting that shows exactly where your search terms appear in notes. Includes a quick-clear button to reset search with one click.
-- **Smart Tagging System:**  
-  Create space-separated tags for each note (e.g., "work personal urgent"). Each tag gets a unique color for easy visual identification. Search by tag names to quickly filter related notes.
-- **Auto-Save:**  
-  Your changes are automatically saved to local storage, ensuring that your notes persist across sessions.
-- **Dual Reminder System:**  
-  Set both global app reminders and individual note reminders. When triggered, reminders automatically open the app and filter to show the relevant note instead of showing popups.
-- **Per-Note Reminders:**  
-  Each note can have its own reminder with a toggleable bell icon. Click the bell to show/hide reminder controls. Bell icon changes from outline to filled based on visibility state.
-- **System Tray Integration:**  
-  Access your notes quickly via a system tray icon, keeping your workspace uncluttered.
-- **Export/Import Notes:**  
-  Export your notes as JSON files through the side navigation menu. Import previously exported notes to restore or merge with existing notes.
-- **Pin Notes:**  
-  Pin important notes to prevent accidental deletion, giving you extra security for critical information.
-- **Resizable Notes:**  
-  Resize notes to your preferred dimensions. Each note remembers its size for a personalized layout.
-- **Draggable Notes:**  
-  Move notes around by dragging them to organize your workspace layout. Each note remembers its position for a customized arrangement.
-- **Search Highlighting:**  
-  When searching, matching terms are highlighted in yellow across note titles, content (in preview mode), and tags for instant visual feedback.
+- **Freeform board** — Drag, resize, and stack notes. Positions, sizes, colors, and z-order persist.
+- **List view** — Switch to a compact list when search results pile up.
+- **Markdown with live preview** — Write in Markdown and see rendered output update as you type.
+- **Search and filters** — Search title, body, tags, and groups. Matching terms are highlighted; tag and group chips filter the board.
+- **Groups and tags** — Organize notes with folders/groups and colored tag chips.
+- **Reminders** — Per-note reminders with daily/weekly repeat, a global app reminder, native OS notifications, and a reminder inbox.
+- **Templates** — Blank, to-do, and meeting note templates (dropdown or right-click **New note**).
+- **Pin and lock** — Pin notes to prevent deletion; lock notes to hide content until you unlock them.
+- **Screen-share blur** — Hide sensitive note text with a one-click blur.
+- **Themes** — Light, dark, or follow system appearance.
+- **Keyboard shortcuts** — `⌘/Ctrl+N` new note, `⌘/Ctrl+F` search, `⌘/Ctrl+P` pin focused note, `⌘/Ctrl+1/2` board/list, arrow keys to move between notes, `Esc` to clear search.
+- **Undo delete** — Recover deleted notes from a toast for 8 seconds.
+- **Import / export** — JSON backup with duplicate-id handling on import.
+- **Tray-first access** — Frameless window with keep-open mode, tray menu, and file-backed storage in app user data (migrates legacy localStorage automatically).
+
+Your data stays on your device.
 
 ---
 
 ## Installation for Developers
-
-### Steps to Set Up the Project
 
 1. Clone the repository:
    ```bash
@@ -49,21 +33,16 @@ Sticky Notes is an elegant, cross-platform desktop application built with Electr
    cd sticky_notes
    ```
 2. Install dependencies:
-
-```bash
+   ```bash
    npm install
-```
-
+   ```
 3. Start the development server:
-
-```bash
+   ```bash
    grunt
-```
-
-4. To build the app:
-
-```bash
+   ```
+4. Build the app:
+   ```bash
    npm run build
-```
+   ```
 
 [!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://buymeacoffee.com/adamkmet)
